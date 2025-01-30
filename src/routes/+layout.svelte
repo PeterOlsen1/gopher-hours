@@ -3,4 +3,6 @@
 	let { children } = $props();
 </script>
 
-{@render children()}
+<div class="w-full grid place-items-center">
+	{@render children()}
+</div>
