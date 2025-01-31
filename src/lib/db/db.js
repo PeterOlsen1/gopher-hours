@@ -80,7 +80,6 @@ export async function addNewUser(userData) {
 export async function uploadNewOfficeHour(data) {
     try {
         const docRef = await addDoc(ohRef, data);
-        console.log('docRef');
         const userDoc = doc(usersRef, data.host, "officeHours", docRef.id);
         data.officeHoursId = docRef.id;
         await setDoc(userDoc, data);
@@ -90,6 +89,7 @@ export async function uploadNewOfficeHour(data) {
         return err;
     }
 }
+
 
 /**
  * Returns data about all office hours
@@ -105,6 +105,7 @@ export async function getAllOfficeHours() {
     return oh;
 }
 
+
 /**
  * Retrieve all office hours according to course query
  * 
@@ -117,4 +118,17 @@ export async function getOfficeHoursByClassQuery(query) {
     const allData = await getAllOfficeHours();
     const filteredData = allData.filter(oh => oh.toLowerCase().course.includes(query.toLowerCase()));
     return filteredData;
+}
+
+
+/**
+ * Get user data according to user id
+ * 
+ * @param {string} uid 
+ * @returns 
+ */
+export async function getUserData(uid) {
+    const docRef = doc(usersRef, uid);
+    const docSnap = await getDoc(docRef);
+    return docSnap.data();
 }
