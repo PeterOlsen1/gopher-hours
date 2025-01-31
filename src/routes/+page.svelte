@@ -1,5 +1,5 @@
 <script>
-    import { signInWithGoogle } from "$lib/db/auth";
+    import { signInWithGoogle } from "$lib/firebase/auth";
 </script>
 
 <style>

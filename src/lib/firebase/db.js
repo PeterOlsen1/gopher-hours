@@ -65,29 +65,39 @@ export async function addNewUser(userData) {
  * Upload new office hour to the database.
  * Data will look as follows:
  * 
- * {
- *     "host": "uid",
- *     "course": "course",
- *     "location": "location",
- *     "link": "link",
- *     "date": "date",
- *     "startTime": "timestamp",
- *     "endTime": "timestamp"
- * }
+    {
+        "endTime": "14:00",
+        "host": {
+            "uid": "snVS969S9Uh6rgTRGsm8KiwivQr1",
+            "name": "Peter Olsen",
+            "email": "olse0321@umn.edu",
+            "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocIuL83tINGEnJFzMrilbAe4pENc4c7Nu0Ki5y04i70g6dONNIg=s96-c",
+            "lastLogin": {
+                "seconds": 1738284498,
+                "nanoseconds": 699000000
+            }
+        },
+        "date": "wednesday",
+        "startTime": "12:00",
+        "location": "Lind L103",
+        "link": "",
+        "course": "CSCI 4131"
+    }
  * 
  * @param {object} data 
  */
 export async function uploadNewOfficeHour(data) {
-    try {
-        const docRef = await addDoc(ohRef, data);
-        const userDoc = doc(usersRef, data.host, "officeHours", docRef.id);
-        data.officeHoursId = docRef.id;
-        await setDoc(userDoc, data);
-        return null;
-    }
-    catch (err) {
-        return err;
-    }
+    //grab host data to store in office hour object
+    const hostData = await getUserData(data.host);
+    data.host = hostData;
+
+    //set the office hour document
+    const docRef = await addDoc(ohRef, data);
+
+    //update the user's data to include the office hour
+    const userDoc = doc(usersRef, data.host.uid, "officeHours", docRef.id);
+    data.officeHoursId = docRef.id;
+    await setDoc(userDoc, data);
 }
 
 
@@ -99,8 +109,10 @@ export async function uploadNewOfficeHour(data) {
 export async function getAllOfficeHours() {
     const querySnapshot = await getDocs(ohRef);
     let oh = [];
-    querySnapshot.forEach((doc) => {
-        oh.push(doc.data());
+    querySnapshot.forEach(async (doc) => {
+        const data = doc.data();
+        data.id = doc.id;
+        oh.push(data);
     });
     return oh;
 }

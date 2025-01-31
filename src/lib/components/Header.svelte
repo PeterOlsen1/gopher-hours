@@ -1,5 +1,5 @@
 <script>
-    import { logout } from "$lib/db/auth";
+    import { logout } from "$lib/firebase/auth";
 </script>
 
 <style>

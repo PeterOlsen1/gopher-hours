@@ -1,38 +1,21 @@
-# sv
+# Gopher Hours
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Gopher hours is a platform where UMN students can find information about
+TAs office hours all in one place. Gone are the days of checking the
+class calendar for every course you're enrolled in, just check
+gopher hours!
 
-## Creating a project
+In order to user gopher hours, you must sign in to your google account,
+(a relatively painless process), so you can be properly be identified when it's
+time to start learning.
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+TODOS:
+* Queue feature (there's big potential here)
+  * See the time users have been in queue
+  * Remove users
+* Finish TA menu
+* Chat feature, web sockets? or just databse stuff
+  * If database, live update?
+* More filtering options if necessary
+* Mobile styling (and styling in general)
+  * dark mode?

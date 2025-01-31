@@ -1,9 +1,9 @@
 <script>
     import Header from "$lib/components/Header.svelte";
-    import { redirectIfNotLoggedIn } from "$lib/db/auth";
-    import { getAllOfficeHours, uploadNewOfficeHour } from "$lib/db/db";
+    import { redirectIfNotLoggedIn } from "$lib/firebase/auth";
+    import { getAllOfficeHours, uploadNewOfficeHour } from "$lib/firebase/db";
     import { onMount } from "svelte";
-    import { user } from "$lib/db/auth";
+    import { user } from "$lib/firebase/auth";
 
     let course, location, link, date, startTime, endTime;
     course = "CSCI 4131";
@@ -24,7 +24,7 @@
         }
 
         //this is a stretch, but make sure they have the link if it's a zoom meeting
-        if (location.toLowerCase().includes("zoom") || location.toLowerCase().includes("online") && !link) {
+        if (location.toLowerCase().includes("zoom") || location.toLowerCase().includes("online") || location.toLowerCase().include("blended") && !link) {
             console.log('no link');
             return;
         }
