@@ -1,12 +1,21 @@
 <script>
     import Header from "$lib/components/Header.svelte";
     import { redirectIfNotLoggedIn } from "$lib/firebase/auth";
-    import { getAllOfficeHours, uploadNewOfficeHour } from "$lib/firebase/db";
+    import { getAllOfficeHours, getTAOfficeHours, uploadNewOfficeHour } from "$lib/firebase/db";
     import { onMount } from "svelte";
     import { user } from "$lib/firebase/auth";
+    import { to12HourTime } from "$lib/utils/utils";
 
-    let course, location, link, date, startTime, endTime;
-    course = "CSCI 4131";
+    let department = $state("")
+    let courseNumber = $state("")
+    let location = $state("")
+    let link = $state("")
+    let date = $state("")
+    let startTime = $state("")
+    let endTime = $state("")
+    let description = $state("");
+    // department = "CSCI";
+    // courseNumber = "4131";
     location = "Lind L103";
     link = "";
     date = "wednesday";
@@ -18,7 +27,7 @@
 
         console.log(startTime);
         //make fancy later
-        if (!course || !location || !date || !startTime || !endTime) {
+        if (!department || !courseNumber || !location || !date || !startTime || !endTime) {
             console.log('nonono');
             return;
         }
@@ -48,8 +57,9 @@
         }
     }
 
-    onMount(() => {
-        redirectIfNotLoggedIn();
+    let officeHours = $state(getTAOfficeHours());
+    onMount(async () => {
+        await redirectIfNotLoggedIn();
     });
 </script>
 
@@ -108,7 +118,21 @@
     button:hover {
         background-color: #f0f0f0;
     }
+
+    i {
+        color: red;
+    }
+
+    .oh-container {
+        width: auto;
+        gap: 1em;
+    }
 </style>
+
+<svelte:head>
+    <title>TA Menu</title>
+    <link rel="stylesheet" href="/style/oh.css">
+</svelte:head>
 
 <Header />
 <div class="w-full flex justify-center flex-col items-center">
@@ -121,11 +145,15 @@
     </div>
     <form>
         <div class="form-group">
-            <label for="course">Course:</label>
-            <input type="text" id="course" name="course" bind:value={course} autocomplete="off">
+            <label for="department"><i>*</i>Department:</label>
+            <input type="text" id="department" name="department" bind:value={department} autocomplete="off" placeholder="CSCI">
         </div>
         <div class="form-group">
-            <label for="location">Location:</label>
+            <label for="course"><i>*</i>Course #:</label>
+            <input type="text" id="course" name="course" bind:value={courseNumber} autocomplete="off" placeholder="1133">
+        </div>
+        <div class="form-group">
+            <label for="location"><i>*</i>Location:</label>
             <input type="text" id="location" name="location" bind:value={location} autocomplete="off">
         </div>
         <div class="form-group">
@@ -134,7 +162,7 @@
         </div>
         <!-- <div> -->
             <div class="form-group">
-                <label for="date">Day:</label>
+                <label for="date"><i>*</i>Day:</label>
                 <select id="date" name="date" bind:value={date}>
                     <option value="monday">Monday</option>
                     <option value="tuesday">Tuesday</option>
@@ -150,20 +178,58 @@
             </div> -->
         <!-- </div> -->
         <div class="form-group">
-            <label for="start-time">Start time:</label>
+            <label for="start-time"><i>*</i>Start time:</label>
             <input type="time" id="start-time" name="start-time" bind:value={startTime} autocomplete="off">
         </div>
         <div class="form-group">
-            <label for="end-time">End time:</label>
+            <label for="end-time"><i>*</i>End time:</label>
             <input type="time" id="end-time" name="end-time" bind:value={endTime} autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <input type="text" id="description" name="description" bind:value={description} autocomplete="off" 
+            placeholder="Homework 2 discussion, etc.">
         </div>
         <button type="submit" onclick={handleFormInput}>Submit</button>
     </form>
     <div class="soft-title">
-        Update Office Hours
+        Edit Office Hours
     </div>
-    <div class="soft-title">
-        Remove Office Hours
-    </div>
+    {#await officeHours}
+        <div>Loading...</div>
+    {:then officeHours} 
+        {#each officeHours as oh}
+            <div class="oh-container">
+                <img src="{oh.host.photoURL}" alt="Host photo" class="w-[6em] h-[6em] rounded-full">
+                <div class="oh-info">
+                    <div>
+                        <b>{oh.course}</b> -
+                        {#if oh.link}
+                            <a href="{oh.link}" target="_blank" rel="noopener noreferrer">{oh.location}</a>
+                        {:else}
+                            {oh.location}
+                        {/if}
+                    </div>
+                    <div>
+                        {oh.date.slice(0, 1).toUpperCase() + oh.date.slice(1) + "s"}, 
+                        {to12HourTime(oh.startTime)} - {to12HourTime(oh.endTime)}
+                    </div>
+                    <div>
+                        Hosted by: {oh.host.name}, <small>{oh.host.email}</small>
+                    </div>
+                </div>
+                <div class="oh-arrow">
+                    <a href="/office-hours/edit/{oh.id}">
+                        <img src="/arrow.png" alt="Arrow" class="w-[3em] h-[3em]">
+                    </a>
+                </div>
+            </div>
+        {/each}
+        {#if officeHours.length == 0}
+            <div>
+                No office hours scheduled yet.
+            </div>
+        {/if}
+    {/await}
 
 </div>

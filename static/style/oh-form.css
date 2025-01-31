@@ -1,0 +1,63 @@
+.title {
+    font-size: 3em;
+    margin-top: 1.5em;
+}
+
+.soft-title {
+    font-size: 2em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+form {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    gap: 1em;
+}
+
+form input, form select, form option {
+    border: 1px solid black;
+    border-radius: 999px;
+    padding: 0.25em 0.5em;
+}
+
+form select {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}
+
+.form-group {
+    display: grid;
+    grid-template-columns: 3fr 7fr;
+    align-items: center;
+}
+
+.form-group label {
+    text-align: right;
+    padding-right: 1em;
+    font-weight: bold;
+}
+
+button {
+    border: 1px solid black;
+    border-radius: 999px;
+    padding: 0.25em 1em;
+    cursor: pointer;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+button:hover {
+    background-color: #f0f0f0;
+}
+
+i {
+    color: red;
+}
+
+.oh-container {
+    width: auto;
+    gap: 1em;
+}

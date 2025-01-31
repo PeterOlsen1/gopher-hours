@@ -144,3 +144,60 @@ export async function getUserData(uid) {
     const docSnap = await getDoc(docRef);
     return docSnap.data();
 }
+
+
+/**
+ * Get all office hours for a specific user
+ * 
+ * @param {string} uid optional user id
+ * @returns all office hours for a specific user
+ */
+export async function getTAOfficeHours(uid=null) {
+    if (!uid) {
+        await ensureAuth();
+        if (!user) {
+            return [];
+        }
+    
+        uid = user.uid;
+    }
+
+    const collectionRef = await collection(usersRef, uid, "officeHours");
+    const querySnapshot = await getDocs(collectionRef);
+    let oh = [];
+    querySnapshot.forEach(async (doc) => {
+        const data = doc.data();
+        data.id = doc.id;
+        oh.push(data);
+    });
+
+    return oh;
+}
+
+/**
+ * Deletes the given office hour.
+ * 
+ * Make sure to ask for conformation before calling this function
+ * 
+ * @param {string} ohId 
+ */
+export async function deleteOfficeHour(ohId) {
+    await deleteDoc(doc(ohRef, ohId));
+
+    //remove the office hour from the user's data
+    const docRef = doc(usersRef, user.uid, "officeHours", ohId);
+    await deleteDoc(docRef);
+}
+
+/**
+ * Return data for a single office hour.
+ * Mostly to be used within the dynamic route.
+ * 
+ * @param {string} ohId office hour ID
+ * @returns {object} office hour data
+ */
+export async function getSingleOfficeHour(ohId) {
+    const docRef = doc(ohRef, ohId);
+    const docSnap = await getDoc(docRef);
+    return docSnap.data();
+}

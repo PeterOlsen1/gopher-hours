@@ -91,6 +91,11 @@
     }
 </style>
 
+<svelte:head>
+    <title>All Office Hours</title>
+    <link rel="stylesheet" href="/style/oh.css">
+</svelte:head>
+
 <Header />
 <div class="w-full flex justify-center flex-col items-center">
     <h1 class="title">

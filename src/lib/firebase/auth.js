@@ -9,7 +9,6 @@ export let user = auth.currentUser;
 export async function ensureAuth() {
     await auth.authStateReady();
     user = auth.currentUser;
-    addNewUser(user);
 }
 
 export async function redirectIfNotLoggedIn() {
@@ -23,6 +22,7 @@ export async function signInWithGoogle() {
     const provider = new GoogleAuthProvider();
     await signInWithPopup(auth, provider);
     await ensureAuth();
+    addNewUser(user);
     console.log(user);
     goto("/home");
 }
