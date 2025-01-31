@@ -1,6 +1,7 @@
 import { app } from "./firebase";
 import { GoogleAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
 import { goto } from "$app/navigation";
+import { addNewUser } from "./db";
 
 let auth = getAuth(app);
 export let user = auth.currentUser;
@@ -8,6 +9,7 @@ export let user = auth.currentUser;
 export async function ensureAuth() {
     await auth.authStateReady();
     user = auth.currentUser;
+    addNewUser(user);
 }
 
 export async function redirectIfNotLoggedIn() {
