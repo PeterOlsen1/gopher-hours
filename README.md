@@ -19,3 +19,5 @@ TODOS:
 * More filtering options if necessary
 * Mobile styling (and styling in general)
   * dark mode?
+* Update firestore rules
+* Figure out weird hosting issues?
