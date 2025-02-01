@@ -182,10 +182,18 @@ export async function getTAOfficeHours(uid=null) {
  * @param {string} ohId 
  */
 export async function deleteOfficeHour(ohId) {
+    await ensureAuth();
+    let docRef = doc(ohRef, ohId);
+    const docSnap = await getDoc(docRef);
+    const data = docSnap.data();
+    if (data.host.uid !== user.uid) {
+        return;
+    }
+
     await deleteDoc(doc(ohRef, ohId));
 
     //remove the office hour from the user's data
-    const docRef = doc(usersRef, user.uid, "officeHours", ohId);
+    docRef = doc(usersRef, user.uid, "officeHours", ohId);
     await deleteDoc(docRef);
 }
 
@@ -200,4 +208,34 @@ export async function getSingleOfficeHour(ohId) {
     const docRef = doc(ohRef, ohId);
     const docSnap = await getDoc(docRef);
     return docSnap.data();
+}
+
+/**
+ * Update the given office hour with the new data.
+ * 
+ * Udpates both the office hour reference and the one on the
+ * user's proifile
+ * 
+ * @param {string} ohId 
+ * @param {object} data 
+ * @returns 
+ */
+export async function updateOfficeHour(ohId, data) {
+    await ensureAuth();
+    if (!user || user.uid !== data.host.uid) {
+        return;
+    }
+
+    const docRef = doc(ohRef, ohId);
+    await updateDoc(docRef, data);
+
+    //update the user's data to include the office hour
+    const userDoc = doc(usersRef, data.host.uid, "officeHours", ohId);
+    const docSnap = await getDoc(userDoc);
+    if (!docSnap.exists()) {
+        setDoc(userDoc, data);
+    }
+    else {
+        updateDoc(userDoc, data);
+    }
 }
