@@ -5,17 +5,18 @@
     import { onMount } from "svelte";
     import { user } from "$lib/firebase/auth";
     import { to12HourTime } from "$lib/utils/utils";
+    import Swal from "sweetalert2";
 
-    let department = $state("")
-    let courseNumber = $state("")
-    let location = $state("")
-    let link = $state("")
-    let date = $state("")
-    let startTime = $state("")
-    let endTime = $state("")
+    let department = $state("");
+    let courseNumber = $state("");
+    let location = $state("");
+    let link = $state("");
+    let date = $state("");
+    let startTime = $state("");
+    let endTime = $state("");
     let description = $state("");
-    // department = "CSCI";
-    // courseNumber = "4131";
+    department = "CSCI";
+    courseNumber = "4131";
     location = "Lind L103";
     link = "";
     date = "wednesday";
@@ -28,13 +29,27 @@
         console.log(startTime);
         //make fancy later
         if (!department || !courseNumber || !location || !date || !startTime || !endTime) {
-            console.log('nonono');
+            Swal.fire({
+                title: 'Error!',
+                text: 'Required fields are missing.',
+                icon: 'error',
+                customClass: {
+                    confirmButton: 'swal2-error-button'
+                },
+            });
             return;
         }
 
         //this is a stretch, but make sure they have the link if it's a zoom meeting
-        if (location.toLowerCase().includes("zoom") || location.toLowerCase().includes("online") || location.toLowerCase().include("blended") && !link) {
-            console.log('no link');
+        if (location && location.toLowerCase().includes("zoom") || location.toLowerCase().includes("online") || location.toLowerCase().include("blended") && !link) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'No link provided for online office hours.',
+                icon: 'error',
+                customClass: {
+                    confirmButton: 'swal2-error-button'
+                },
+            });
             return;
         }
 
@@ -48,12 +63,26 @@
             endTime
         }
 
-        const result = await uploadNewOfficeHour(data);
-        if (result) {
-            console.log("Error uploading office hour: " + result);
+        try {
+            // await uploadNewOfficeHour(data);
+            Swal.fire({
+                title: 'Success!',
+                text: 'Office hours uploaded successfully.',
+                icon: 'success'
+            });
+
+            officeHours.push(data);
         }
-        else {
-            console.log("Office hour uploaded successfully!");
+        catch (e) {
+            console.log("Error uploading office hour: " + e);
+            Swal.fire({
+                title: 'Error!',
+                text: 'Upload failed, try again later.',
+                icon: 'error',
+                customClass: {
+                    confirmButton: 'swal2-error-button'
+                },
+            });
         }
     }
 

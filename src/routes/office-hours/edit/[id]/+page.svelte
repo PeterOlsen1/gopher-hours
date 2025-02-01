@@ -2,8 +2,10 @@
     import Header from "$lib/components/Header.svelte";
     import { page } from "$app/state";
     import { onMount } from "svelte";
-    import { getSingleOfficeHour } from "$lib/firebase/db";
+    import { deleteOfficeHour, getSingleOfficeHour } from "$lib/firebase/db";
     import { redirectIfNotLoggedIn } from "$lib/firebase/auth";
+    import Swal from "sweetalert2";
+    import { goto } from "$app/navigation";
 
     const id = page.params.id;
     let ohData;
@@ -30,13 +32,27 @@
         console.log(startTime);
         //make fancy later
         if (!department || !courseNumber || !location || !date || !startTime || !endTime) {
-            console.log('nonono');
+            Swal.fire({
+                title: 'Error!',
+                text: 'Required fields are missing.',
+                icon: 'error',
+                customClass: {
+                    confirmButton: 'swal2-error-button'
+                },
+            });
             return;
         }
 
         //this is a stretch, but make sure they have the link if it's a zoom meeting
         if (location.toLowerCase().includes("zoom") || location.toLowerCase().includes("online") || location.toLowerCase().include("blended") && !link) {
-            console.log('no link');
+            Swal.fire({
+                title: 'Error!',
+                text: 'No link provided for online office hours.',
+                icon: 'error',
+                customClass: {
+                    confirmButton: 'swal2-error-button'
+                },
+            });
             return;
         }
 
@@ -50,12 +66,45 @@
             endTime
         }
 
-        const result = await uploadNewOfficeHour(data);
-        if (result) {
-            console.log("Error uploading office hour: " + result);
+        try {
+            await uploadNewOfficeHour(data);
+            Swal.fire({
+                title: 'Success!',
+                text: 'Office hours uploaded successfully.',
+                icon: 'success'
+            });
         }
-        else {
-            console.log("Office hour uploaded successfully!");
+        catch (e) {
+            console.log("Error uploading office hour: " + e);
+            Swal.fire({
+                title: 'Error!',
+                text: 'Upload failed, try again later.',
+                icon: 'error',
+                customClass: {
+                    confirmButton: 'swal2-error-button'
+                },
+            });
+        }
+    }
+
+    async function confirmDelete() {
+        let result = await Swal.fire({
+            title: 'Warning!',
+            text: 'Deleting an office hour can not be undone!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Confirm',
+            cancelButtonText: 'Cancel', 
+            customClass: {
+                confirmButton: 'custom-confirm-button', 
+                cancelButton: 'custom-cancel-button'
+            },
+            buttonsStyling: false
+        });
+
+        if (result.isConfirmed) {
+            deleteOfficeHour(id);
+            goto('/ta');
         }
     }
 
@@ -65,13 +114,24 @@
     });
 </script>
 
+<style>
+    button[type="submit"] {
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 1em;
+    }
+</style>
+
 <svelte:head>
     <title>Edit Office Hours</title>
-    <link rel="stylesheet" src="/style/oh-form.css">
+    <link rel="stylesheet" href="/style/oh-form.css">
 </svelte:head>
 <Header />
 
-<h1>Edit office hours</h1>
+<div class="title">
+    Edit Office Hours
+</div>
+<br>
 <form>
     <div class="form-group">
         <label for="department"><i>*</i>Department:</label>
@@ -119,5 +179,6 @@
         <input type="text" id="description" name="description" bind:value={description} autocomplete="off" 
         placeholder="Homework 2 discussion, etc.">
     </div>
-    <button type="submit" onclick={handleFormInput}>Submit</button>
+    <button type="submit" onclick={handleFormInput}>Save Edits</button>
 </form>
+<button onclick={confirmDelete}>Delete</button>

@@ -14,3 +14,32 @@
 }
 
 
+.swal2-confirm {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-right: 0.5em;
+}
+
+.swal2-cancel,
+.swal2-error-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-left: 0.5em;
+}
+
+.swal2-confirm:hover {
+    background-color: #218838;
+}
+
+.swal2-cancel:hover,
+.swal2-error-button:hover {
+    background-color: #c82333;
+}
