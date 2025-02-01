@@ -65,3 +65,9 @@ EXAMPLE
 .oh-arrow img {
     cursor: pointer;
 }
+
+.oh-description {
+    margin-left: 1em;
+    text-wrap: wrap;
+    max-width: 50%;
+}

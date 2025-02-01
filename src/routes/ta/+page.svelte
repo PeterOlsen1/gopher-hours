@@ -1,11 +1,14 @@
 <script>
     import Header from "$lib/components/Header.svelte";
+    import OfficeHour from "$lib/components/OfficeHour.svelte";
     import { redirectIfNotLoggedIn } from "$lib/firebase/auth";
-    import { getAllOfficeHours, getTAOfficeHours, uploadNewOfficeHour } from "$lib/firebase/db";
+    import { getAllOfficeHours, getTAOfficeHours, getUserData, uploadNewOfficeHour } from "$lib/firebase/db";
     import { onMount } from "svelte";
     import { user } from "$lib/firebase/auth";
     import { to12HourTime } from "$lib/utils/utils";
     import Swal from "sweetalert2";
+
+    let officeHours = $state(getTAOfficeHours());
 
     let department = $state("");
     let courseNumber = $state("");
@@ -41,7 +44,7 @@
         }
 
         //this is a stretch, but make sure they have the link if it's a zoom meeting
-        if (location && location.toLowerCase().includes("zoom") || location.toLowerCase().includes("online") || location.toLowerCase().include("blended") && !link) {
+        if (location.toLowerCase().includes("zoom") || location.toLowerCase().includes("online") || location.toLowerCase().includes("blended") && !link) {
             Swal.fire({
                 title: 'Error!',
                 text: 'No link provided for online office hours.',
@@ -55,23 +58,30 @@
 
         const data = {
             host: user.uid,
-            course,
+            courseNumber,
+            department,
             location,
             link,
             date,
             startTime,
-            endTime
+            endTime,
+            description
         }
 
         try {
-            // await uploadNewOfficeHour(data);
+            await uploadNewOfficeHour(data);
+
             Swal.fire({
                 title: 'Success!',
                 text: 'Office hours uploaded successfully.',
                 icon: 'success'
             });
-
-            officeHours.push(data);
+            
+            const userData = await getUserData(user.uid);
+            data.host = userData;
+            let officeHoursCopy = await officeHours;
+            officeHoursCopy.push(data);
+            officeHours = officeHoursCopy;
         }
         catch (e) {
             console.log("Error uploading office hour: " + e);
@@ -86,7 +96,6 @@
         }
     }
 
-    let officeHours = $state(getTAOfficeHours());
     onMount(async () => {
         await redirectIfNotLoggedIn();
     });
@@ -153,7 +162,7 @@
     }
 
     .oh-container {
-        width: auto;
+        width: 50%;
         gap: 1em;
     }
 </style>
@@ -228,31 +237,7 @@
         <div>Loading...</div>
     {:then officeHours} 
         {#each officeHours as oh}
-            <div class="oh-container">
-                <img src="{oh.host.photoURL}" alt="Host photo" class="w-[6em] h-[6em] rounded-full">
-                <div class="oh-info">
-                    <div>
-                        <b>{oh.course}</b> -
-                        {#if oh.link}
-                            <a href="{oh.link}" target="_blank" rel="noopener noreferrer">{oh.location}</a>
-                        {:else}
-                            {oh.location}
-                        {/if}
-                    </div>
-                    <div>
-                        {oh.date.slice(0, 1).toUpperCase() + oh.date.slice(1) + "s"}, 
-                        {to12HourTime(oh.startTime)} - {to12HourTime(oh.endTime)}
-                    </div>
-                    <div>
-                        Hosted by: {oh.host.name}, <small>{oh.host.email}</small>
-                    </div>
-                </div>
-                <div class="oh-arrow">
-                    <a href="/office-hours/edit/{oh.id}">
-                        <img src="/arrow.png" alt="Arrow" class="w-[3em] h-[3em]">
-                    </a>
-                </div>
-            </div>
+            <OfficeHour oh={oh} menu={"ta"} />
         {/each}
         {#if officeHours.length == 0}
             <div>
