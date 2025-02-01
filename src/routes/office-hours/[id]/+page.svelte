@@ -2,34 +2,56 @@
     import Header from "$lib/components/Header.svelte";
     import { page } from "$app/state";
     import { onMount } from "svelte";
-    import { getSingleOfficeHour } from "$lib/firebase/db";
+    import { addToQueue, getSingleOfficeHour } from "$lib/firebase/db";
     import { to12HourTime } from "$lib/utils/utils";
+    import { redirectIfNotLoggedIn, user } from "$lib/firebase/auth";
 
     const id = page.params.id;
 
     //testing data for now
     let data = $state({
-    "department": "CSCI",
-    "startTime": "12:00",
-    "date": "wednesday",
-    "host": {
-        "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocIuL83tINGEnJFzMrilbAe4pENc4c7Nu0Ki5y04i70g6dONNIg=s96-c",
-        "uid": "snVS969S9Uh6rgTRGsm8KiwivQr1",
-        "email": "olse0321@umn.edu",
-        "lastLogin": {
-            "seconds": 1738348369,
-            "nanoseconds": 479000000
+        "startTime": "12:00",
+        "department": "CSCI",
+        "endTime": "14:00",
+        "courseNumber": "4131",
+        "queue": [
+            {
+                "currentlyQueued": true,
+                "email": "olse0321@umn.edu",
+                "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocIuL83tINGEnJFzMrilbAe4pENc4c7Nu0Ki5y04i70g6dONNIg=s96-c",
+                "name": "Peter Olsen",
+                "uid": "snVS969S9Uh6rgTRGsm8KiwivQr1",
+                "queuedFor": "WItfOqt5ntizeg27kYhB",
+                "lastLogin": {
+                    "seconds": 1738348369,
+                    "nanoseconds": 479000000
+                }
+            }
+        ],
+        "link": "",
+        "host": {
+            "name": "Peter Olsen",
+            "email": "olse0321@umn.edu",
+            "uid": "snVS969S9Uh6rgTRGsm8KiwivQr1",
+            "lastLogin": {
+                "seconds": 1738348369,
+                "nanoseconds": 479000000
+            },
+            "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocIuL83tINGEnJFzMrilbAe4pENc4c7Nu0Ki5y04i70g6dONNIg=s96-c"
         },
-        "name": "Peter Olsen"
-    },
-    "courseNumber": "4131",
-    "endTime": "14:00",
-    "location": "Lind L103",
-    "link": "",
-    "description": "Homework 1 discussion"
-});
+        "location": "Lind L103",
+        "description": "Homework 1 discussion",
+        "date": "wednesday"
+    });
 
+    function handleQueueJoin() {
+        console.log("join queue");
+        addToQueue(id, user.uid);
+    }
+
+    let queue = $state([]);
     onMount(async () => {
+        await redirectIfNotLoggedIn();
         // data = await getSingleOfficeHour(id);
         // console.log(data);
     });
@@ -41,11 +63,17 @@
         margin-top: 2em;
     }
 
+    .soft-title {
+        font-size: 2em;
+        margin-top: 0.5em;
+    }
+
     .main {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        text-align: center;
         width: 100%;
     }
 
@@ -54,6 +82,7 @@
         justify-content: space-evenly;
         gap: 1em;
         box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+        border: 1px solid black;
         padding: 1em 2em;
         border-radius: 1em;
         width: 50%;
@@ -71,8 +100,21 @@
         justify-content: center;
         gap: 0.5em;
     }
+
+    .queue-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5em 1em;
+        border: 1px solid black;
+        border-radius: 1em;
+        margin: 0.5em;
+    }
 </style>
 
+<svelte:head>
+    <title>{data.department} {data.courseNumber} Office Hours</title>
+</svelte:head>
 <Header />
 
 <div class="title">
@@ -87,17 +129,34 @@
             <div><b>Email:</b> {data.host.email}</div>
         </div>
         <div class="host-info"> 
-            <div><b>Location:</b> {data.location}</div>
+            {#if data.link} 
+                <div><a href="{data.link}"><b>Location:</b></a> {data.location}</div>
+            {:else}
+                <div><b>Location:</b> {data.location}</div>
+            {/if}
             <div><b>Time:</b> {to12HourTime(data.startTime)} - {to12HourTime(data.endTime)}</div>
         </div>
     </div>
 
-    <div>
-        add host options! (change description, time / location?)
+    {#if user.uid === data.host.uid}
+        <div>
+            Host controls!!!!
+        </div>
+    {/if}
+    <div class="queue">
+        <div class="soft-title">Queue</div>
+        {#each data.queue as q}
+            <div class="queue-item">
+                <img src="{q.photoUrl}" alt="{q.name}">
+            </div>
+        {/each}
+        {#if data.queue.length == 0}
+            <div>No students in queue</div>
+        {/if}
+        <button onclick={handleQueueJoin}>Join Queue</button>
     </div>
-    <div>
-        queue!
-    </div>
+
+    <br><br><br>
     <div>
         chat?????
     </div>

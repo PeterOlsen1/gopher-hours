@@ -239,3 +239,70 @@ export async function updateOfficeHour(ohId, data) {
         updateDoc(userDoc, data);
     }
 }
+
+/**
+ * Add the given user to the queue of
+ * the given office hour.
+ * 
+ * Will not add the same student twice
+ * 
+ * Mark their profile as currentlyQueued
+ * 
+ * @param {string} ohId 
+ * @param {string} uid 
+ * @returns 
+ */
+export async function addToQueue(ohId, uid) {
+    const userRef = doc(usersRef, uid);
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+    userData.currentlyQueued = true;
+    userData.queuedFor = ohId;
+    await updateDoc(userRef, userData);
+
+    const docRef = doc(ohRef, ohId);
+    const docSnap = await getDoc(docRef);
+    const data = docSnap.data();
+    if (!data.queue) {
+        data.queue = [];
+    }
+    else {
+        if (data.queue.includes(uid)) {
+            return;
+        }
+    }
+
+    userData.queueTime = Timestamp.now();
+    data.queue.push(userData);
+    await updateDoc(docRef, data);
+}
+
+/**
+ * Remove the given user from the given 
+ * office hour's queue.
+ * 
+ * Update their profile to reflect that they
+ * are not queueing anymore
+ * 
+ * @param {string} ohId 
+ * @param {string} uid 
+ * @returns 
+ */
+export async function removeFromQueue(ohId, uid) {
+    const docRef = doc(ohRef, ohId);
+    const docSnap = await getDoc(docRef);
+    const data = docSnap.data();
+    if (!data.queue) {
+        return;
+    }
+
+    data.queue = data.queue.filter(id => id !== uid);
+    await updateDoc(docRef, data);
+
+    const userRef = doc(usersRef, uid);
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+    userData.currentlyQueued = false;
+    userData.queuedFor = "";
+    await updatedDoc(userRef, userData);
+}

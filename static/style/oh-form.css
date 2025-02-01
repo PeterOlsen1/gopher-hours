@@ -40,15 +40,6 @@ form select {
     font-weight: bold;
 }
 
-button {
-    border: 1px solid black;
-    border-radius: 999px;
-    padding: 0.25em 1em;
-    cursor: pointer;
-    margin-left: auto;
-    margin-right: auto;
-}
-
 button:hover {
     background-color: #f0f0f0;
 }
