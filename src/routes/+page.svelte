@@ -110,8 +110,8 @@
 
 <svelte:head>
     <title>Gopher Hours</title>
-    <meta name="description" content="View all office hours for your courses. Find TAs, locations, and times.">
-    <meta name="keywords" content="university of minnesota, umn, office hours, TAs, courses, university, schedule">
+    <meta name="description" content="A site for UMN students to view all office hours for their courses and connect with their TAs.">
+    <meta name="keywords" content="university of minnesota, gopher, gopher hours, umn, office hours, TAs, courses, university">
 </svelte:head>
 <div class="w-full h-screen flex flex-col justify-center items-center">
 
