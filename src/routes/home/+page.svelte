@@ -5,24 +5,27 @@
     import { getAllOfficeHours } from "$lib/firebase/db";
     import { data, groupOfficeHoursByDate, to12HourTime } from "$lib/utils/utils";
     import OfficeHour from "$lib/components/OfficeHour.svelte";
+    import { load } from "../office-hours/[id]/+page";
 
     let officeHours = $state([]);
+    let originalOfficeHours = [];
+    let loading = $state(true);
     let groupedOfficeHours = $derived.by(() => {
         return groupOfficeHoursByDate(officeHours);
     });
 
     function handleSearch(e) {
         const search = e.target.value.toLowerCase();
-        console.log(search);
-        officeHours = officeHours.filter(oh => {
-            console.log(oh);
-            return JSON.parse(oh).toLowerCase().includes(search);
+        officeHours = originalOfficeHours.filter(oh => {
+            return JSON.stringify(oh).toLowerCase().includes(search);
         });
     }
 
     onMount(async () => {
         await redirectIfNotLoggedIn();
         officeHours = await getAllOfficeHours();
+        originalOfficeHours = officeHours;
+        loading = false;
     });
 </script>
 
@@ -94,11 +97,9 @@
         <img src="/search.png" alt="Search" class="relative right-0 top-0 w-[1.3em] h-[1.3em] left-[-2em]">
     </div>
     <div class="main-container">
-        {#if !officeHours.length}
+        {#if loading}
             <br><br>
-            <div>
-                Loading...
-            </div>
+            <div class="loading-spinner"></div>
         {/if}
         {#each Object.keys(groupedOfficeHours) as group}
             <div class="oh-header">
@@ -108,5 +109,11 @@
                 <OfficeHour {oh} menu={"home"}/>
             {/each}
         {/each}
+        {#if officeHours.length === 0 && !loading}
+            <br><br>
+            <div class="text-xl">
+                No office hours found!
+            </div>
+        {/if}
     </div>
 </div>

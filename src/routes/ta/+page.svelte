@@ -14,7 +14,7 @@
     let courseNumber = $state("");
     let location = $state("");
     let link = $state("");
-    let date = $state("");
+    let date = $state("monday");
     let startTime = $state("");
     let endTime = $state("");
     let description = $state("");
@@ -158,6 +158,39 @@
         width: 50%;
         gap: 1em;
     }
+
+    @media (max-width: 800px) {
+        .title {
+            font-size: 2em;
+            margin-top: 1em;
+        }
+
+        .soft-title {
+            font-size: 1.5em;
+            margin-top: 0.25em;
+        }
+
+        form {
+            gap: 0.5em;
+            width: 85%;
+            font-size: 0.9em;
+        }
+
+        form input, form select, form option {
+            padding: 0.25em 0.5em;
+            font-size: 0.8em;
+        }
+
+        .form-group {
+            grid-template-columns: 1fr 3fr;
+        }
+
+        button {
+            padding: 0.25em 0.5em;
+            font-size: 0.9em;
+            margin-top: 0.5em;
+        }
+    }
 </style>
 
 <svelte:head>
@@ -184,7 +217,7 @@
         </div>
         <div class="form-group">
             <label for="location"><i>*</i>Location:</label>
-            <input type="text" id="location" name="location" bind:value={location} autocomplete="off">
+            <input type="text" id="location" name="location" bind:value={location} autocomplete="off" placeholder="Keller Atrium, Zoom, etc.">
         </div>
         <div class="form-group">
             <label for="link">Link (if online):</label>
@@ -222,11 +255,12 @@
         </div>
         <button type="submit" onclick={handleFormInput}>Submit</button>
     </form>
+    <br>
     <div class="soft-title">
         Edit Office Hours
     </div>
     {#await officeHours}
-        <div>Loading...</div>
+        <div class="loading-spinner"></div>
     {:then officeHours} 
         {#each officeHours as oh}
             <OfficeHour oh={oh} menu={"ta"} />

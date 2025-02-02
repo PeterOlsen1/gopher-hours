@@ -72,7 +72,6 @@
         await redirectIfNotLoggedIn();
         currentUid = user.uid;
         host = user.uid === data.host.uid;
-        // console.log(data);
     });
 </script>
 
