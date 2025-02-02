@@ -94,6 +94,7 @@
         align-items: center;
         text-align: center;
         width: 100%;
+        gap: 1em;
     }
 
     .host {
@@ -101,13 +102,11 @@
         border: 1px solid black;
         padding: 1em 2em;
         border-radius: 1em;
-        width: 50%;
-    }
-
-    .host-top {
+        width: 55%;
         display: flex;
         justify-content: space-evenly;
         gap: 1em;
+        flex-wrap: wrap;
     }
 
     .host img {
@@ -149,6 +148,66 @@
         height: 5em;
         border-radius: 50%;
     }
+
+    .queue-item button {
+        font-size: 0.8em;
+    }
+
+    @media (width < 1200px) {
+        .title {
+            font-size: 2.5em;
+        }
+
+        .soft-title {
+            font-size: 1.75em;
+        }
+
+        .host {
+            width: 80%;
+        }
+    }
+
+    @media (width < 800px) {
+        .host {
+            width: 100%;
+            border-radius: 0;
+            border-left: 0;
+            border-right: 0;
+            padding: 0.5em 1em;
+        }
+
+        .host img {
+            width: 5em;
+            height: 5em;
+        }
+
+        .host-info {
+            flex: 1;
+        }
+
+        .title {
+            font-size: 2em;
+        }
+
+        .soft-title {
+            font-size: 1.5em;
+        }
+
+        .queue {
+            width: 100%;
+        }
+
+        .queue-item {
+            width: 100%;
+            border-radius: 0;
+            border-left: 0;
+            border-right: 0;
+        }
+
+        .queue-item-info {
+            flex: 1;
+        }
+    }
 </style>
 
 <Header />
@@ -163,31 +222,32 @@
 <br>
 <div class="main">
     <div class="host">
-        <div class="host-top">
-            <img src={data.host.photoURL} alt="host" />
-            <div class="host-info">
-                <div><b>TA:</b> {data.host.name}</div>
-                <div><b>Email:</b> {data.host.email}</div>
-            </div>
-            <div class="host-info"> 
-                {#if data.link} 
-                    <div><a href="{data.link}"><b>Location:</b></a> {data.location}</div>
-                {:else}
-                    <div><b>Location:</b> {data.location}</div>
-                {/if}
-                <div><b>Time:</b> {to12HourTime(data.startTime)} - {to12HourTime(data.endTime)}</div>
-            </div>
+        <img src={data.host.photoURL} alt="host" />
+        <div class="host-info info-1">
+            <div><b>TA:</b> {data.host.name}</div>
+            <div><b>Email:</b> {data.host.email}</div>
+        </div>
+        <div class="host-info info-2"> 
+            {#if data.link} 
+                <div><a href="{data.link}"><b>Location:</b></a> {data.location}</div>
+            {:else}
+                <div><b>Location:</b> {data.location}</div>
+            {/if}
+            <div><b>Time:</b> {to12HourTime(data.startTime)} - {to12HourTime(data.endTime)}</div>
         </div>
     </div>
 
     {#if data.description}
-        <div class="soft-title">Description</div>
         <div>
-            {data.description}
+            <div class="soft-title">Description</div>
+            <div>
+                {data.description}
+            </div>
+            {#if host}
+                <div class="mt-3"></div>
+                <button>Edit Description</button>
+            {/if}
         </div>
-        {#if host}
-            <button>Edit Description</button>
-        {/if}
     {/if}
     <div class="queue">
         <div class="soft-title">Queue</div>
@@ -195,7 +255,7 @@
             <div class="queue-item">
                 <b>{q.position}</b>
                 <img src="{q.photoURL}" alt="{q.name}">
-                <div>
+                <div class="queue-item-info">
                     <div>{q.name || q.displayName}</div>
                     <div>{q.email}</div>
                     <div><b>Queued at:</b> {q.queueTime.toDate().toLocaleTimeString()}</div>

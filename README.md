@@ -22,3 +22,4 @@ TODOS:
 * Mobile styling (and styling in general)
   * dark mode?
 * Update firestore rules
+* Generate qr code?
