@@ -18,13 +18,6 @@
     let startTime = $state("");
     let endTime = $state("");
     let description = $state("");
-    department = "CSCI";
-    courseNumber = "4131";
-    location = "Lind L103";
-    link = "";
-    date = "wednesday";
-    startTime = "12:00";
-    endTime = "14:00";
 
     async function handleFormInput(e) {
         e.preventDefault();

@@ -241,6 +241,20 @@ export async function updateOfficeHour(ohId, data) {
 }
 
 /**
+ * Use previous methods to update only the description
+ * of a given office hour. Used in the host menu
+ * of the office hour page.
+ * 
+ * @param {string} ohId 
+ * @param {string} description 
+ */
+export async function updateOfficeHourDescription(ohId, description) {
+    const ohData = await getSingleOfficeHour(ohId);
+    ohData.description = description;
+    updateOfficeHour(ohId, ohData);
+}
+
+/**
  * Add the given user to the queue of
  * the given office hour.
  * 
@@ -296,7 +310,7 @@ export async function removeFromQueue(ohId, uid) {
         return;
     }
 
-    data.queue = data.queue.filter(id => id !== uid);
+    data.queue = data.queue.filter(q => q.uid != uid);
     await updateDoc(docRef, data);
 
     const userRef = doc(usersRef, uid);
@@ -304,5 +318,5 @@ export async function removeFromQueue(ohId, uid) {
     const userData = userDoc.data();
     userData.currentlyQueued = false;
     userData.queuedFor = "";
-    await updatedDoc(userRef, userData);
+    await updateDoc(userRef, userData);
 }

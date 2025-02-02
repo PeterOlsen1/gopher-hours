@@ -8,16 +8,16 @@
     import { goto } from "$app/navigation";
 
     const id = page.params.id;
-    let ohData;
+    let ohData = $state(page.data);
 
-    let department = $state("")
-    let courseNumber = $state("")
-    let location = $state("")
-    let link = $state("")
-    let date = $state("")
-    let startTime = $state("")
-    let endTime = $state("")
-    let description = $state("");
+    let department = $state(ohData.department);
+    let courseNumber = $state(ohData.courseNumber);
+    let location = $state(ohData.location);
+    let link = $state(ohData.link);
+    let date = $state(ohData.date);
+    let startTime = $state(ohData.startTime);
+    let endTime = $state(ohData.endTime);
+    let description = $state(ohData.description);
 
     async function handleFormInput(e) {
         e.preventDefault();
@@ -103,16 +103,6 @@
 
     onMount(async () => {
         await redirectIfNotLoggedIn();
-        ohData = await getSingleOfficeHour(id);
-
-        department = ohData.department;
-        courseNumber = ohData.courseNumber;
-        location = ohData.location;
-        link = ohData.link;
-        date = ohData.date;
-        startTime = ohData.startTime;
-        endTime = ohData.endTime;
-        description = ohData.description;
     });
 </script>
 

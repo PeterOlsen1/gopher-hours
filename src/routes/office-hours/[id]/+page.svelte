@@ -2,57 +2,76 @@
     import Header from "$lib/components/Header.svelte";
     import { page } from "$app/state";
     import { onMount } from "svelte";
-    import { addToQueue, getSingleOfficeHour } from "$lib/firebase/db";
+    import { addToQueue, getSingleOfficeHour, getUserData, removeFromQueue } from "$lib/firebase/db";
     import { to12HourTime } from "$lib/utils/utils";
     import { redirectIfNotLoggedIn, user } from "$lib/firebase/auth";
+    import { Timestamp } from "firebase/firestore";
+    import Swal from "sweetalert2";
 
     const id = page.params.id;
 
     //testing data for now
-    let data = $state({
-        "startTime": "12:00",
-        "department": "CSCI",
-        "endTime": "14:00",
-        "courseNumber": "4131",
-        "queue": [
-            {
-                "currentlyQueued": true,
-                "email": "olse0321@umn.edu",
-                "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocIuL83tINGEnJFzMrilbAe4pENc4c7Nu0Ki5y04i70g6dONNIg=s96-c",
-                "name": "Peter Olsen",
-                "uid": "snVS969S9Uh6rgTRGsm8KiwivQr1",
-                "queuedFor": "WItfOqt5ntizeg27kYhB",
-                "lastLogin": {
-                    "seconds": 1738348369,
-                    "nanoseconds": 479000000
-                }
-            }
-        ],
-        "link": "",
-        "host": {
-            "name": "Peter Olsen",
-            "email": "olse0321@umn.edu",
-            "uid": "snVS969S9Uh6rgTRGsm8KiwivQr1",
-            "lastLogin": {
-                "seconds": 1738348369,
-                "nanoseconds": 479000000
-            },
-            "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocIuL83tINGEnJFzMrilbAe4pENc4c7Nu0Ki5y04i70g6dONNIg=s96-c"
-        },
-        "location": "Lind L103",
-        "description": "Homework 1 discussion",
-        "date": "wednesday"
-    });
+    let loading = $state(false);
+    let data = $state(page.data);
+    let currentlyEditing = $state(false);
 
-    function handleQueueJoin() {
-        console.log("join queue");
-        addToQueue(id, user.uid);
+
+    async function handleQueueJoin() {
+        for (const q of data.queue) {
+            if (q.uid === user.uid) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'You are already in the queue.',
+                    icon: 'error',
+                    customClass: {
+                        confirmButton: 'swal2-error-button'
+                    },
+                });
+                return;
+            }
+        }
+        loading = true;
+        await addToQueue(id, user.uid);
+
+        const nextIdx = data.queue.length + 1;
+        const userCopy = user;
+        userCopy.position = nextIdx;
+        userCopy.queueTime = Timestamp.now();
+        data.queue.push(userCopy); 
+        loading = false;
+    }
+    
+    function handleQueueRemove(removalId) {
+        if (host || currentUid == removalId) {
+            removeFromQueue(id, removalId);
+            data.queue = data.queue.filter(q => q.uid !== removalId);
+        }
+        else {
+            Swal.fire({
+                title: 'Error!',
+                text: 'You cannot remove others from the queue.',
+                icon: 'error',
+                customClass: {
+                    confirmButton: 'swal2-error-button'
+                },
+            });
+        }
+    } 
+
+    function handleEditDescription() {
+        if (currentlyEditing) {
+            
+        }
+        
+        currentlyEditing = !currentlyEditing;
     }
 
-    let queue = $state([]);
+    let host = $state(false);
+    let currentUid = $state("");
     onMount(async () => {
         await redirectIfNotLoggedIn();
-        // data = await getSingleOfficeHour(id);
+        currentUid = user.uid;
+        host = user.uid === data.host.uid;
         // console.log(data);
     });
 </script>
@@ -78,14 +97,17 @@
     }
 
     .host {
-        display: flex;
-        justify-content: space-evenly;
-        gap: 1em;
         box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
         border: 1px solid black;
         padding: 1em 2em;
         border-radius: 1em;
         width: 50%;
+    }
+
+    .host-top {
+        display: flex;
+        justify-content: space-evenly;
+        gap: 1em;
     }
 
     .host img {
@@ -99,6 +121,16 @@
         flex-direction: column;
         justify-content: center;
         gap: 0.5em;
+        text-wrap: wrap;
+        text-align: left;
+    }
+
+    .queue {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5em;
     }
 
     .queue-item {
@@ -109,13 +141,21 @@
         border: 1px solid black;
         border-radius: 1em;
         margin: 0.5em;
+        gap: 1em;
+    }
+
+    .queue-item img {
+        width: 5em;
+        height: 5em;
+        border-radius: 50%;
     }
 </style>
+
+<Header />
 
 <svelte:head>
     <title>{data.department} {data.courseNumber} Office Hours</title>
 </svelte:head>
-<Header />
 
 <div class="title">
     {data.department} {data.courseNumber} Office Hours
@@ -123,36 +163,52 @@
 <br>
 <div class="main">
     <div class="host">
-        <img src={data.host.photoURL} alt="host photo" />
-        <div class="host-info">
-            <div><b>TA:</b> {data.host.name}</div>
-            <div><b>Email:</b> {data.host.email}</div>
-        </div>
-        <div class="host-info"> 
-            {#if data.link} 
-                <div><a href="{data.link}"><b>Location:</b></a> {data.location}</div>
-            {:else}
-                <div><b>Location:</b> {data.location}</div>
-            {/if}
-            <div><b>Time:</b> {to12HourTime(data.startTime)} - {to12HourTime(data.endTime)}</div>
+        <div class="host-top">
+            <img src={data.host.photoURL} alt="host" />
+            <div class="host-info">
+                <div><b>TA:</b> {data.host.name}</div>
+                <div><b>Email:</b> {data.host.email}</div>
+            </div>
+            <div class="host-info"> 
+                {#if data.link} 
+                    <div><a href="{data.link}"><b>Location:</b></a> {data.location}</div>
+                {:else}
+                    <div><b>Location:</b> {data.location}</div>
+                {/if}
+                <div><b>Time:</b> {to12HourTime(data.startTime)} - {to12HourTime(data.endTime)}</div>
+            </div>
         </div>
     </div>
 
-    {#if user.uid === data.host.uid}
+    {#if data.description}
+        <div class="soft-title">Description</div>
         <div>
-            Host controls!!!!
+            {data.description}
         </div>
+        {#if host}
+            <button>Edit Description</button>
+        {/if}
     {/if}
     <div class="queue">
         <div class="soft-title">Queue</div>
         {#each data.queue as q}
             <div class="queue-item">
-                <img src="{q.photoUrl}" alt="{q.name}">
+                <b>{q.position}</b>
+                <img src="{q.photoURL}" alt="{q.name}">
+                <div>
+                    <div>{q.name || q.displayName}</div>
+                    <div>{q.email}</div>
+                    <div><b>Queued at:</b> {q.queueTime.toDate().toLocaleTimeString()}</div>
+                </div>
+                {#if host || currentUid == q.uid}
+                    <button onclick={() => handleQueueRemove(q.uid)}>Remove</button>
+                {/if}
             </div>
         {/each}
         {#if data.queue.length == 0}
             <div>No students in queue</div>
         {/if}
+        <div class="loading-spinner" style="display: {loading ? 'block' : 'none'}"></div>
         <button onclick={handleQueueJoin}>Join Queue</button>
     </div>
 
