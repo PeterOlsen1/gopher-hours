@@ -14,8 +14,9 @@
     function handleSearch(e) {
         const search = e.target.value.toLowerCase();
         console.log(search);
-        officeHours = data.filter(oh => {
-            return JSON.stringify(oh).toLowerCase().includes(search);
+        officeHours = officeHours.filter(oh => {
+            console.log(oh);
+            return JSON.parse(oh).toLowerCase().includes(search);
         });
     }
 
@@ -55,11 +56,28 @@
         flex-direction: column;
         align-items: center;
     }
+
+    .oh-header {
+        width: 75%;
+        font-size: 2em;
+        font-weight: bold;
+        margin-top: 1em;
+    }
+
+    @media (width < 800px) {
+        .title {
+            font-size: 2em;
+        }
+
+        .oh-header {
+            font-size: 1.5em;
+            width: 95%;
+        }
+    }
 </style>
 
 <svelte:head>
     <title>All Office Hours</title>
-    <link rel="stylesheet" href="/style/oh.css">
 </svelte:head>
 
 <Header />

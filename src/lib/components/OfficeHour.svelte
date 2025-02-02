@@ -10,6 +10,81 @@
     }
 </script>
 
+<style>
+    .oh-container {
+        border: 1px solid black;
+        border-radius: 0.5em;
+        padding: 0.5em;
+        margin: 0.5em;
+        display: flex;
+        justify-content: flex-start;
+        width: 80%;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    .oh-info {
+        margin-left: 1em;
+        display: flex;
+        justify-content: flex-start;
+        flex-direction: column;
+    }
+
+    .oh-arrow {
+        flex-grow: 1;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding-right: 2em;
+    }
+
+    .oh-arrow img {
+        cursor: pointer;
+    }
+
+    .oh-description {
+        margin-left: 1em;
+        text-wrap: wrap;
+        max-width: 50%;
+    }
+
+    @media (width < 800px) {
+        .oh-container {
+            width: 100%;
+            border-radius: 0px;
+            border-left: 0px;
+            border-right: 0px;
+
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+            grid-template-rows: auto auto;
+        }
+
+        .oh-container img {
+            grid-column: 1 / 3;
+        }
+
+        .oh-info {
+            grid-column: 3 / 8;
+            text-align: left;
+        }
+
+        .oh-description {
+            grid-column: 1 / 6;
+            max-width: 100%;
+            margin: 0;
+            text-align: center;
+            display: grid;
+            place-items: center;
+        }
+
+        .oh-arrow {
+            grid-column: 7 / 8;
+            padding: 0;
+            margin-right: 1em;
+        }
+    }
+</style>
+
 <div class="oh-container">
     <img src="{oh.host.photoURL}" alt="Host photo" class="w-[6em] h-[6em] rounded-full">
     <div class="oh-info">
@@ -31,7 +106,9 @@
     </div>
     {#if oh.description}
         <div class="oh-description">
-            <b>Description:</b> {oh.description}
+            <div>
+                <b>Description:</b> {oh.description}
+            </div>
         </div>
     {/if}
     <div class="oh-arrow">

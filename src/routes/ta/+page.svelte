@@ -162,7 +162,6 @@
 
 <svelte:head>
     <title>TA Menu</title>
-    <link rel="stylesheet" href="/style/oh.css">
 </svelte:head>
 
 <Header />

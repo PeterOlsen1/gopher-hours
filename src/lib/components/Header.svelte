@@ -14,8 +14,6 @@
         font-size: 2em;
         padding-top: 0.5em;
         padding-bottom: 0.5em;
-        /* background-color: rgb(78, 2, 2); */
-        /* color: white; */
         text-align: center;
         box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
     }
@@ -46,6 +44,12 @@
     .home img {
         max-width: 2em;
         max-height: 2em;
+    }
+
+    @media (width < 800px) {
+        .header {
+            font-size: 1.25em;
+        }
     }
 </style>
 

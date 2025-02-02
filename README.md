@@ -10,10 +10,10 @@ In order to user gopher hours, you must sign in to your google account,
 time to start learning.
 
 TODOS:
+* redo search on the main page
 * Individual office hours page
+  * Handle editing description easily
   * Queue feature (there's big potential here)
-    * See the time users have been in queue
-    * Remove users
     * Ambitious, but send texts/emails/maybe notifications its their turn?
   * Host options to change things around, move queue around too?
 * Chat feature, web sockets? or just databse stuff
