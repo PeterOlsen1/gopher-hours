@@ -4,14 +4,16 @@
 
 <style>
     .maroon {
-        background-color: rgb(78, 2, 2);
+        /* background-color: rgb(78, 2, 2); */
+        background: url("/maroon.png");
+        color: white;
     }
 
     .header {
         width: 100%;
         display: grid;
         grid-template-columns: 2fr 7fr 2fr;
-        font-size: 2em;
+        font-size: 1.5em;
         padding-top: 0.5em;
         padding-bottom: 0.5em;
         text-align: center;
@@ -53,10 +55,10 @@
     }
 </style>
 
-<div class="w-full">
+<!-- <div class="w-full">
     <div class="header">
         <a href="/home" class="home logout">
-            <img src="/favicon.ico" alt="Gopher">
+            <img src="/old-gopher.png" alt="Gopher">
             Home
         </a>
         <div class="links">
@@ -67,6 +69,25 @@
         <div class="logout" onclick={logout}>
             Logout
             <img src="/logout.png" alt="log out arrow">
+        </div>
+    </div>
+</div> -->
+
+
+<div class="w-full maroon">
+    <div class="header">
+        <a href="/home" class="home logout">
+            <!-- <img src="/old-gopher-black.jpg" alt="Gopher" style="filter: grayscale(1);"> -->
+            Home
+        </a>
+        <div class="links">
+            <a href="/ta">
+                TA Menu
+            </a>
+        </div>
+        <div class="logout" onclick={logout}>
+            Logout
+            <img src="/logout.png" alt="log out arrow" style="filter: invert(1);">
         </div>
     </div>
 </div>

@@ -20,6 +20,7 @@ TODOS:
   * If database, live update?
 * More filtering options if necessary
 * Mobile styling (and styling in general)
+  * Front page mobile mode
   * dark mode?
 * Update firestore rules
 * Generate qr code?
