@@ -222,10 +222,21 @@ export async function getSingleOfficeHour(ohId) {
  */
 export async function updateOfficeHour(ohId, data) {
     await ensureAuth();
-    if (!user || user.uid !== data.host.uid) {
+
+    //get real data
+    const ohData = await getSingleOfficeHour(ohId);
+
+    //check if we've got the perms
+    if (!user || user.uid !== ohData.host.uid) {
+        console.log("User does not have proper authorization to update this office hour");
         return;
     }
 
+    //make sure we don't lose these
+    data.host = ohData.host;
+    data.queue = ohData.queue;
+
+    //write to the office hours reference
     const docRef = doc(ohRef, ohId);
     await updateDoc(docRef, data);
 

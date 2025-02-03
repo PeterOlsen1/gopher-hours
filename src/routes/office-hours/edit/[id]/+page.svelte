@@ -2,10 +2,11 @@
     import Header from "$lib/components/Header.svelte";
     import { page } from "$app/state";
     import { onMount } from "svelte";
-    import { deleteOfficeHour, getSingleOfficeHour } from "$lib/firebase/db";
-    import { redirectIfNotLoggedIn } from "$lib/firebase/auth";
+    import { deleteOfficeHour, getSingleOfficeHour, updateOfficeHour } from "$lib/firebase/db";
+    import { redirectIfNotLoggedIn, user } from "$lib/firebase/auth";
     import Swal from "sweetalert2";
     import { goto } from "$app/navigation";
+    import { data } from "$lib/utils/utils";
 
     const id = page.params.id;
     let ohData = $state(page.data);
@@ -37,7 +38,7 @@
         }
 
         //this is a stretch, but make sure they have the link if it's a zoom meeting
-        if (location.toLowerCase().includes("zoom") || location.toLowerCase().includes("online") || location.toLowerCase().include("blended") && !link) {
+        if (location.toLowerCase().includes("zoom") || location.toLowerCase().includes("online") || location.toLowerCase().includes("blended") && !link) {
             Swal.fire({
                 title: 'Error!',
                 text: 'No link provided for online office hours.',
@@ -51,27 +52,30 @@
 
         const data = {
             host: user.uid,
-            course,
+            department,
+            courseNumber,
             location,
             link,
             date,
             startTime,
-            endTime
+            endTime,
+            description
         }
 
         try {
-            await uploadNewOfficeHour(data);
+            await updateOfficeHour(id, data);
             Swal.fire({
                 title: 'Success!',
-                text: 'Office hours uploaded successfully.',
+                text: 'Office hours updated successfully.',
                 icon: 'success'
             });
+            goto('/ta');
         }
         catch (e) {
-            console.log("Error uploading office hour: " + e);
+            console.log("Error updating office hour: " + e);
             Swal.fire({
                 title: 'Error!',
-                text: 'Upload failed, try again later.',
+                text: 'Update failed, try again later.',
                 icon: 'error',
                 customClass: {
                     confirmButton: 'swal2-error-button'
@@ -80,6 +84,9 @@
         }
     }
 
+    /**
+     * Make sure they know what they are doing
+     */
     async function confirmDelete() {
         let result = await Swal.fire({
             title: 'Warning!',
@@ -103,6 +110,13 @@
 
     onMount(async () => {
         await redirectIfNotLoggedIn();
+
+        //make sure the user is on their own data!
+        //we could show a modal here but the user could delete it and edit
+        //data regardless. so just redirect instantly
+        if (user.uid != page.data.host.uid) {
+            goto("/ta");
+        }
     });
 </script>
 
@@ -174,3 +188,4 @@
     <button type="submit" onclick={handleFormInput}>Save Edits</button>
 </form>
 <button onclick={confirmDelete}>Delete</button>
+<br><br><br>

@@ -10,7 +10,6 @@ In order to user gopher hours, you must sign in to your google account,
 time to start learning.
 
 TODOS:
-* redo search on the main page
 * Individual office hours page
   * Handle editing description easily
   * Queue feature (there's big potential here)
