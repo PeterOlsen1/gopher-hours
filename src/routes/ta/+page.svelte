@@ -22,7 +22,6 @@
     async function handleFormInput(e) {
         e.preventDefault();
 
-        console.log(startTime);
         //make fancy later
         if (!department || !courseNumber || !location || !date || !startTime || !endTime) {
             Swal.fire({
@@ -58,7 +57,8 @@
             date,
             startTime,
             endTime,
-            description
+            description,
+            queue : []
         }
 
         try {
@@ -75,6 +75,16 @@
             let officeHoursCopy = await officeHours;
             officeHoursCopy.push(data);
             officeHours = officeHoursCopy;
+
+            department = "";
+            courseNumber = "";
+            location = "";
+            link = "";
+            date = "monday";
+            startTime = "";
+            endTime = "";
+            description = "";
+
         }
         catch (e) {
             console.log("Error uploading office hour: " + e);

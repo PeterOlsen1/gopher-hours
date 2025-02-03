@@ -151,6 +151,12 @@
     .queue-item button {
         font-size: 0.8em;
     }
+    
+    .description {
+        max-width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+    }
 
     @media (width < 1200px) {
         .title {
@@ -239,7 +245,7 @@
     {#if data.description}
         <div>
             <div class="soft-title">Description</div>
-            <div>
+            <div class="description">
                 {data.description}
             </div>
             {#if host}
@@ -264,7 +270,7 @@
                 {/if}
             </div>
         {/each}
-        {#if data.queue.length == 0}
+        {#if data.queue && data.queue.length == 0}
             <div>No students in queue</div>
         {/if}
         <div class="loading-spinner" style="display: {loading ? 'block' : 'none'}"></div>

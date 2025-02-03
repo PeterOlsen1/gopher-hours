@@ -33,6 +33,7 @@
     .title {
         font-size: 3em;
         margin-top: 2em;
+        margin-bottom: -0.25em;
     }
 
     input {
@@ -45,6 +46,7 @@
     .search {
         display: flex;
         align-items: center;
+        width: 60%;
     }
 
     .search input {
@@ -86,14 +88,14 @@
 <Header />
 <div class="w-full flex justify-center flex-col items-center">
     <h1 class="title">
-        All Office Hours
+        Office Hours
     </h1>
-    <br>
     <div>
-        Search to refine results
+        Find all office hours by date and time.
     </div>
+    <br>
     <div class="search">
-        <input type="text" onkeyup={handleSearch}>
+        <input type="text" onkeyup={handleSearch} placeholder="CSCI 1133...">
         <img src="/search.png" alt="Search" class="relative right-0 top-0 w-[1.3em] h-[1.3em] left-[-2em]">
     </div>
     <div class="main-container">
@@ -117,3 +119,4 @@
         {/if}
     </div>
 </div>
+<br>
