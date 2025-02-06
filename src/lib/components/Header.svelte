@@ -12,10 +12,10 @@
     .header {
         width: 95%;
         display: grid;
-        grid-template-columns: 2fr 7fr 2fr;
+        grid-template-columns: 2fr 7fr;
         font-size: 1.5em;
-        padding-top: 0.5em;
-        padding-bottom: 0.5em;
+        padding-top: 0.7em;
+        padding-bottom: 0.7em;
         text-align: center;
         box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
     }
@@ -23,7 +23,10 @@
     .links {
         width: 100%;
         display: flex;
-        justify-content: space-evenly;
+        /* justify-content: space-evenly; */
+        justify-content: flex-end;
+        gap: 1.5em;
+        align-items: center;
     }
 
     .logout {
@@ -44,9 +47,20 @@
         max-height: 2em;
     }
 
+    .old-gopher {
+        width: 3em;
+        height: 3em;
+        background-color: white;
+        border-radius: 0.1em;
+    }
+
     @media (width < 800px) {
+        .links {
+            gap: 0.75em;
+        }
+
         .header {
-            font-size: 1.25em;
+            font-size: 0.9em;
         }
     }
 </style>
@@ -72,18 +86,20 @@
 
 <div class="w-full maroon flex justify-center">
     <div class="header">
-        <a href="/home" class="home logout">
-            <!-- <img src="/old-gopher-black.jpg" alt="Gopher" style="filter: grayscale(1);"> -->
-            Home
-        </a>
+        <div>
+            <img src="/gopher-comic.png" alt="old gopher" class="old-gopher">
+        </div>
         <div class="links">
             <a href="/ta">
                 TA Menu
             </a>
-        </div>
-        <div class="logout" onclick={logout}>
-            Logout
-            <img src="/logout.png" alt="log out arrow" style="filter: invert(1);">
+            <a href="/home" class="home">
+                Home
+            </a>
+            <div class="logout" onclick={logout}>
+                Logout
+                <img src="/logout.png" alt="log out arrow" style="filter: invert(1);">
+            </div>
         </div>
     </div>
 </div>
