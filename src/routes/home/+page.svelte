@@ -71,12 +71,20 @@
 
     @media (width < 800px) {
         .title {
-            font-size: 2em;
+            font-size: 1.8em;
+        }
+
+        .subtitle {
+            font-size: 0.9em;
         }
 
         .oh-header {
-            font-size: 1.5em;
+            font-size: 1.2em;
             width: 95%;
+        }
+
+        .search {
+            width: 80%;
         }
     }
 </style>
@@ -90,7 +98,7 @@
     <h1 class="title">
         Office Hours
     </h1>
-    <div>
+    <div class="subtitle">
         Find all office hours by date and time.
     </div>
     <br>

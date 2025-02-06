@@ -131,7 +131,6 @@ img {
 
 .img-background {
   position: absolute;
-  width: 5em;
   margin-top: 7.5em;
   height: 35em;
   width: 35em;
@@ -149,11 +148,63 @@ img {
 
 .text-container {
   position: relative;
-  /* top: -5em; */
 }
 
-@media (width < 1250px) {
-  /* do stuff here */
+@media (height < 900px) {
+  img {
+    height: 40em;
+  }
+
+  .img-background {
+    height: 30em;
+    width: 30em;
+    margin-top: 5em;
+  }
+}
+
+@media (width < 1200px) {
+  img {
+    height: 30em;
+  }
+
+  .img-background {
+    height: 20em;
+    width: 20em;
+    margin-top: 5em;
+  }
+}
+
+@media (width < 800px) {
+  img {
+    height: 25em;
+  }
+
+  .img-background {
+    height: 17em;
+    width: 17em;
+    margin-top: 4em;
+  }
+
+  .title {
+    font-size: 2em;
+  }
+
+  .subtitle {
+    font-size: 1.2em;
+  }
+
+  .main {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .img-container {
+    order: 1;
+  }
+
+  .text-container {
+    order: 2;
+  }
 }
 </style>
 
@@ -164,7 +215,7 @@ img {
 </svelte:head>
 <div class="w-full h-screen flex flex-col justify-center items-center">
 
-  <div class="flex items-center">
+  <div class="flex items-center main">
     <div class="text-container">
       <h1 class="title">Gopher Hours</h1>
       <p class="text-lg">View office hours for UMN courses, find TAs, locations, and times.</p>

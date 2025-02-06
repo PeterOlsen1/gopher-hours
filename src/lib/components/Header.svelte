@@ -10,7 +10,7 @@
     }
 
     .header {
-        width: 100%;
+        width: 95%;
         display: grid;
         grid-template-columns: 2fr 7fr 2fr;
         font-size: 1.5em;
@@ -24,10 +24,6 @@
         width: 100%;
         display: flex;
         justify-content: space-evenly;
-    }
-
-    .links div {
-        cursor: pointer;
     }
 
     .logout {
@@ -74,7 +70,7 @@
 </div> -->
 
 
-<div class="w-full maroon">
+<div class="w-full maroon flex justify-center">
     <div class="header">
         <a href="/home" class="home logout">
             <!-- <img src="/old-gopher-black.jpg" alt="Gopher" style="filter: grayscale(1);"> -->

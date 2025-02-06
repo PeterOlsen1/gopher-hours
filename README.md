@@ -11,6 +11,7 @@ time to start learning.
 
 TODOS:
 * Individual office hours page
+  * mobile friendly
   * Handle editing description easily
   * Queue feature (there's big potential here)
     * Ambitious, but send texts/emails/maybe notifications its their turn?
@@ -19,7 +20,6 @@ TODOS:
   * If database, live update?
 * More filtering options if necessary
 * Mobile styling (and styling in general)
-  * Front page mobile mode
   * dark mode?
 * Update firestore rules
 * Generate qr code?

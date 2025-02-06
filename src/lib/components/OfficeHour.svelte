@@ -47,15 +47,22 @@
         max-width: 50%;
     }
 
+    .host-photo {
+        width: 6em;
+        height: 6em;
+        border-radius: 50%;
+    }
+
     @media (width < 800px) {
         .oh-container {
             width: 100%;
             border-radius: 0px;
             border-left: 0px;
             border-right: 0px;
+            font-size: 0.8em;
 
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+            grid-template-columns: repeat(1fr, 10);
             grid-template-rows: auto auto;
         }
 
@@ -64,7 +71,7 @@
         }
 
         .oh-info {
-            grid-column: 3 / 8;
+            grid-column: 3 / 10;
             text-align: left;
         }
 
@@ -82,11 +89,16 @@
             padding: 0;
             margin-right: 1em;
         }
+
+        .host-photo {
+            width: 5em;
+            height: 5em;
+        }
     }
 </style>
 
 <div class="oh-container">
-    <img src="{oh.host.photoURL}" alt="Host photo" class="w-[6em] h-[6em] rounded-full">
+    <img src="{oh.host.photoURL}" alt="Host photo" class="host-photo">
     <div class="oh-info">
         <div>
             <b>{oh.department} {oh.courseNumber}</b> -
