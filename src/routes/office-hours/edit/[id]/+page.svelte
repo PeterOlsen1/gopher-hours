@@ -87,7 +87,9 @@
     /**
      * Make sure they know what they are doing
      */
-    async function confirmDelete() {
+    async function confirmDelete(e) {
+        e.preventDefault();
+
         let result = await Swal.fire({
             title: 'Warning!',
             text: 'Deleting an office hour can not be undone!',
@@ -121,10 +123,8 @@
 </script>
 
 <style>
-    button[type="submit"] {
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: 1em;
+    .title {
+        margin-bottom: -0.2em;
     }
 </style>
 
@@ -137,7 +137,10 @@
 <div class="title">
     Edit Office Hours
 </div>
-<br>
+<div>
+    Edit information for an existing office hour
+</div>
+<br><br>
 <form>
     <div class="form-group">
         <label for="department"><i>*</i>Department:</label>
@@ -185,7 +188,11 @@
         <input type="text" id="description" name="description" bind:value={description} autocomplete="off" 
         placeholder="Homework 2 discussion, etc.">
     </div>
-    <button type="submit" onclick={handleFormInput}>Save Edits</button>
+    <br>
+    <div class="flex justify-center">
+        <button type="submit" onclick={handleFormInput}>Save</button>
+        <button onclick={(e) => {e.preventDefault(); goto('/ta')}}>Cancel</button>
+        <button onclick={confirmDelete}>Delete</button>
+    </div>
 </form>
-<button onclick={confirmDelete}>Delete</button>
 <br><br><br>

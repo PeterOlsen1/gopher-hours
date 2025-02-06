@@ -31,11 +31,8 @@
 
 <style>
     .title {
-        font-size: 3em;
-        margin-top: 2em;
-        margin-bottom: -0.25em;
+        margin-bottom: -0.2em;
     }
-
     input {
         width: 100%;
         border: 1px solid black;
@@ -70,10 +67,6 @@
     }
 
     @media (width < 800px) {
-        .title {
-            font-size: 1.8em;
-        }
-
         .subtitle {
             font-size: 0.9em;
         }
@@ -85,6 +78,7 @@
 
         .search {
             width: 80%;
+            font-size: 0.8em;
         }
     }
 </style>
@@ -101,9 +95,9 @@
     <div class="subtitle">
         Find all office hours by date and time.
     </div>
-    <br>
+    <br><br>
     <div class="search">
-        <input type="text" onkeyup={handleSearch} placeholder="CSCI 1133...">
+        <input type="text" onkeyup={handleSearch} placeholder="Search office hours by keyword...">
         <img src="/search.png" alt="Search" class="relative right-0 top-0 w-[1.3em] h-[1.3em] left-[-2em]">
     </div>
     <div class="main-container">

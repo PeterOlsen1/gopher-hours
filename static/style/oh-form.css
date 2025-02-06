@@ -19,8 +19,9 @@ form {
 
 form input, form select, form option {
     border: 1px solid black;
-    border-radius: 999px;
+    border-radius: 9998px;
     padding: 0.25em 0.5em;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
 }
 
 form select {
@@ -51,4 +52,38 @@ i {
 .oh-container {
     width: auto;
     gap: 1em;
+}
+
+
+@media (max-width: 800px) {
+    .title {
+        font-size: 2em;
+        margin-top: 1em;
+    }
+
+    .soft-title {
+        font-size: 1.5em;
+        margin-top: 0.25em;
+    }
+
+    form {
+        gap: 0.5em;
+        width: 85%;
+        font-size: 0.9em;
+    }
+
+    form input, form select, form option {
+        padding: 0.25em 0.5em;
+        font-size: 0.8em;
+    }
+
+    .form-group {
+        grid-template-columns: 1fr 3fr;
+    }
+
+    button {
+        padding: 0.25em 0.5em;
+        font-size: 0.9em;
+        margin-top: 0.5em;
+    }
 }

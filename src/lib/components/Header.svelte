@@ -7,6 +7,7 @@
         /* background-color: rgb(78, 2, 2); */
         background: url("/maroon.png");
         color: white;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
     }
 
     .header {
@@ -14,10 +15,10 @@
         display: grid;
         grid-template-columns: 2fr 7fr;
         font-size: 1.5em;
+        font-weight: 500;
         padding-top: 0.7em;
         padding-bottom: 0.7em;
         text-align: center;
-        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
     }
 
     .links {
@@ -48,10 +49,8 @@
     }
 
     .old-gopher {
-        width: 3em;
         height: 3em;
-        background-color: white;
-        border-radius: 0.1em;
+        filter: grayscale(1);
     }
 
     @media (width < 800px) {
@@ -65,29 +64,14 @@
     }
 </style>
 
-<!-- <div class="w-full">
-    <div class="header">
-        <a href="/home" class="home logout">
-            <img src="/old-gopher.png" alt="Gopher">
-            Home
-        </a>
-        <div class="links">
-            <a href="/ta">
-                TA Menu
-            </a>
-        </div>
-        <div class="logout" onclick={logout}>
-            Logout
-            <img src="/logout.png" alt="log out arrow">
-        </div>
-    </div>
-</div> -->
-
 
 <div class="w-full maroon flex justify-center">
     <div class="header">
         <div>
-            <img src="/gopher-comic.png" alt="old gopher" class="old-gopher">
+            <a href="/">
+                <!-- <img src="/logo.png" alt="old gopher" class="old-gopher"> -->
+                 <b style="font-sioze">GopherHours.</b>
+            </a>
         </div>
         <div class="links">
             <a href="/ta">

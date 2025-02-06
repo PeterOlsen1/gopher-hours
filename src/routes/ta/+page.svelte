@@ -106,14 +106,7 @@
 
 <style>
     .title {
-        font-size: 3em;
-        margin-top: 1.5em;
-    }
-
-    .soft-title {
-        font-size: 2em;
-        margin-top: 0.5em;
-        margin-bottom: 0.5em;
+        margin-bottom: -0.2em;
     }
 
     form {
@@ -170,16 +163,6 @@
     }
 
     @media (max-width: 800px) {
-        .title {
-            font-size: 2em;
-            margin-top: 1em;
-        }
-
-        .soft-title {
-            font-size: 1.5em;
-            margin-top: 0.25em;
-        }
-
         form {
             gap: 0.5em;
             width: 85%;
@@ -212,10 +195,10 @@
     <h1 class="title">
         TA Menu
     </h1>
-    <br>
-    <div class="soft-title">
+    <div>
         Schedule new Office Hours
     </div>
+    <br>
     <form>
         <div class="form-group">
             <label for="department"><i>*</i>Department:</label>
@@ -281,5 +264,5 @@
             </div>
         {/if}
     {/await}
-
+        <br><br>
 </div>

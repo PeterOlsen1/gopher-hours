@@ -12,7 +12,6 @@
 
 <style>
     .oh-container {
-        border: 1px solid black;
         border-radius: 0.5em;
         padding: 0.5em;
         margin: 0.5em;

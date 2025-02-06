@@ -76,16 +76,6 @@
 </script>
 
 <style>
-    .title {
-        font-size: 3em;
-        margin-top: 2em;
-    }
-
-    .soft-title {
-        font-size: 2em;
-        margin-top: 0.5em;
-    }
-
     .main {
         display: flex;
         flex-direction: column;
@@ -97,8 +87,8 @@
     }
 
     .host {
-        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
-        border: 1px solid black;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+        /* border: 1px solid black; */
         padding: 1em 2em;
         border-radius: 1em;
         width: 55%;
@@ -136,8 +126,9 @@
         justify-content: space-between;
         align-items: center;
         padding: 0.5em 1em;
-        border: 1px solid black;
+        /* border: 1px solid black; */
         border-radius: 1em;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
         margin: 0.5em;
         gap: 1em;
     }
@@ -159,20 +150,16 @@
     }
 
     @media (width < 1200px) {
-        .title {
-            font-size: 2.5em;
-        }
-
-        .soft-title {
-            font-size: 1.75em;
-        }
-
         .host {
             width: 80%;
         }
     }
 
     @media (width < 800px) {
+        .main {
+            font-size: 0.8em;
+        }
+        
         .host {
             width: 100%;
             border-radius: 0;
@@ -188,14 +175,6 @@
 
         .host-info {
             flex: 1;
-        }
-
-        .title {
-            font-size: 2em;
-        }
-
-        .soft-title {
-            font-size: 1.5em;
         }
 
         .queue {
