@@ -1,0 +1,124 @@
+.main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    gap: 1em;
+}
+
+.host {
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    /* border: 1px solid black; */
+    padding: 1em 2em;
+    border-radius: 1em;
+    width: 55%;
+    display: flex;
+    justify-content: space-evenly;
+    gap: 1em;
+    flex-wrap: wrap;
+}
+
+.host img {
+    width: 8em;
+    height: 8em;
+    border-radius: 50%;
+}
+
+.host-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5em;
+    text-wrap: wrap;
+    text-align: left;
+}
+
+.queue {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.queue-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5em 1em;
+    /* border: 1px solid black; */
+    border-radius: 1em;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    margin: 0.5em;
+    gap: 1em;
+}
+
+.queue-item img {
+    width: 5em;
+    height: 5em;
+    border-radius: 50%;
+}
+
+.queue-item button {
+    font-size: 0.8em;
+}
+
+.description {
+    /* max-width: 80%; */
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+input {
+    border: 1px solid black;
+    border-radius: 9998px;
+    padding: 0.25em 0.5em;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+}
+
+@media (width < 1200px) {
+    .host {
+        width: 80%;
+    }
+}
+
+@media (width < 800px) {
+    .main {
+        font-size: 0.8em;
+    }
+    
+    .host {
+        width: 100%;
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+        padding: 0.5em 1em;
+    }
+
+    .host img {
+        width: 5em;
+        height: 5em;
+    }
+
+    .host-info {
+        flex: 1;
+    }
+
+    .queue {
+        width: 100%;
+    }
+
+    .queue-item {
+        width: 100%;
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+    }
+
+    .queue-item-info {
+        flex: 1;
+    }
+}
