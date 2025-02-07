@@ -76,10 +76,13 @@
     display: flex;
     flex-direction: column;
     gap: 1em;
-    max-width: 40em;
+    max-width: 45em;
     padding: 1em;
     width: 100vw;
-    background-color: rgba(80, 1, 1, 0.486);
+    border: 1px solid black;
+    border-radius: 1em 1em 0 0;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    border-bottom: 0;
     padding-bottom: 2em;
     scrollbar-width: thin;
 }
@@ -115,19 +118,38 @@
 }
 
 .chatbox img {
-    width: 3em;
-    height: 3em;
+    width: 2.5em;
+    height: 2.5em;
     border-radius: 50%;
 }
 
 .chat-message-text {
-    background-color: white;
+    background-color: rgb(112, 3, 3);
+    color: white;
     border-radius: 0.5em;
     margin-left: auto;
+    height: 100%;
     max-width: min(20em, 50%);
-    padding: 0.25em;
+    padding: 0.35em;
     max-height: 35em;
     overflow-y: scroll;
+    text-align: left;
+}
+
+.timestamp-right {
+    font-size: 0.75em;
+    width: calc(100% - 10em);
+    text-align: right;
+    margin-top: -1em;
+    margin-bottom: -1em;
+}
+
+.timestamp-left {
+    font-size: 0.75em;
+    width: calc(100% - 10em);
+    text-align: left;
+    margin-top: -1em;
+    margin-bottom: -1em;
 }
 
 .left .chat-message-text {
@@ -138,6 +160,7 @@
 .chat-input {
     display: flex;
     justify-content: center;
+    width: 100%;
 }
 
 .send-button {
@@ -154,7 +177,7 @@
     padding-right: 2.75em;
     padding-left: 0.5em;
     width: 100%;
-    max-width: min(20em, 50%);
+    max-width: 35em;
 }
 
 input {
@@ -162,6 +185,11 @@ input {
     border-radius: 9998px;
     padding: 0.25em 0.5em;
     box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+}
+
+.no-messages {
+    font-size: 1.5em;
+    font-weight: bold;
 }
 
 @media (width < 1200px) {
@@ -208,7 +236,11 @@ input {
     }
 
     .chatbox {
+        border-right: 0;
+        border-left: 0;
         width: 100%;
+        border-radius: 0;
+        max-width: 100%;
     }
 
     .chat-input {

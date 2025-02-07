@@ -15,7 +15,8 @@ TODOS:
     * Ambitious, but send texts/emails/maybe notifications its their turn?
   * Host options to change things around, move queue around too?
 * Chat feature (no web sockets)
-  * clear chat at some point (don't take up too much db space)
+  * delete messages after 24 hours
+  * Give host priveliges to delete chats
 * Mobile styling (and styling in general)
   * dark mode?
 * Update firestore rules

@@ -14,7 +14,7 @@
     let loading = $state(false);
     let data = $state(page.data);
     let currentlyEditing = $state(false);
-    let chatMessage = $state("testing chat");
+    let chatMessage = $state("");
     let host = $state(false);
     let currentUid = $state("");
     let descriptionText = $state("");
@@ -198,6 +198,9 @@
                         </div>
                         <img src="{msg.userData.photoURL}" alt="user">
                     </div>
+                    <div class="timestamp-right">
+                        {msg.timestamp.toDate().toLocaleTimeString()}
+                    </div>
                 {:else}
                     <div class="message left">
                         <img src="{msg.userData.photoURL}" alt="user">
@@ -205,8 +208,14 @@
                             {msg.message}
                         </div>
                     </div>
+                    <div class="timestamp-left">
+                        {msg.timestamp.toDate().toLocaleTimeString()}
+                    </div>
                 {/if}
             {/each}
+            {#if !chat.length}
+                <div class="no-messages">No messages yet!</div>
+            {/if}
         </div>
         <div class="chat-input">
             <input type="text" bind:value={chatMessage} onkeypress={handleChatKeyPress}
@@ -214,5 +223,8 @@
             <img src="/send.png" alt="send" class="send-button"
             onclick={() => {addNewChatMessage(id, user, chatMessage); chatMessage = ""}}>
         </div>
+        <small style="margin-top: -1em">
+            Messages are automatically deleted after 24 hours.
+        </small>
     </div>
 </div>
