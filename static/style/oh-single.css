@@ -72,6 +72,91 @@
     margin-right: auto;
 }
 
+.chatbox {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    max-width: 40em;
+    padding: 1em;
+    width: 100vw;
+    background-color: rgba(80, 1, 1, 0.486);
+    padding-bottom: 2em;
+    scrollbar-width: thin;
+}
+
+.chatbox::-webkit-scrollbar {
+    display: none;
+    margin-left: 0.2em;
+}
+
+.chatbox-upper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    max-height: 40em;
+    overflow-y: scroll;
+    padding-bottom: 1em;
+}
+
+.message {
+    display: flex;
+    align-items: center;
+    gap: 0.2em;
+    width: 100%;
+}
+
+.left {
+    justify-content: flex-start;
+}
+
+.right {
+    justify-content: flex-end;
+}
+
+.chatbox img {
+    width: 3em;
+    height: 3em;
+    border-radius: 50%;
+}
+
+.chat-message-text {
+    background-color: white;
+    border-radius: 0.5em;
+    margin-left: auto;
+    max-width: min(20em, 50%);
+    padding: 0.25em;
+    max-height: 35em;
+    overflow-y: scroll;
+}
+
+.left .chat-message-text {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+.chat-input {
+    display: flex;
+    justify-content: center;
+}
+
+.send-button {
+    width: 2em;
+    height: 2em;
+    cursor: pointer;
+    position: relative;
+    left: -1.5em;
+}
+
+.chat-input input {
+    position: relative;
+    left: 1.5em;
+    padding-right: 2.75em;
+    padding-left: 0.5em;
+    width: 100%;
+    max-width: min(20em, 50%);
+}
+
 input {
     border: 1px solid black;
     border-radius: 9998px;
@@ -120,5 +205,20 @@ input {
 
     .queue-item-info {
         flex: 1;
+    }
+
+    .chatbox {
+        width: 100%;
+    }
+
+    .chat-input {
+        width: 90%;
+        position: relative;
+        left: 5%;
+    }
+
+    .chat-input input {
+        width: 100%;
+        max-width: 100%;
     }
 }

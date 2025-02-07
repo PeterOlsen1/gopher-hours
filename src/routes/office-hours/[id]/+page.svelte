@@ -18,6 +18,7 @@
     let host = $state(false);
     let currentUid = $state("");
     let descriptionText = $state("");
+    let chat = $state([]);
 
 
     /**
@@ -80,6 +81,15 @@
      */
     function handleChatMessage(messages) {
         console.log(messages);
+        messages.sort((a, b) => a.timestamp.seconds - b.timestamp.seconds);
+        chat = messages;
+    }
+
+    function handleChatKeyPress(e) {
+        if (e.key === "Enter") {
+            addNewChatMessage(id, user, chatMessage);
+            chatMessage = "";
+        }
     }
 
     onMount(async () => {
@@ -178,9 +188,31 @@
     </div>
 
     <br><br><br>
-    <div>
-        <input type="text" bind:value={chatMessage} 
-        placeholder="Send a message to the room...">
-        <button onclick={() => addNewChatMessage(id, user, chatMessage)}>Send</button>
+    <div class="chatbox">
+        <div class="chatbox-upper">
+            {#each chat as msg}
+                {#if msg.userData.uid == user.uid}
+                    <div class="message right">
+                        <div class="chat-message-text">
+                            {msg.message}
+                        </div>
+                        <img src="{msg.userData.photoURL}" alt="user">
+                    </div>
+                {:else}
+                    <div class="message left">
+                        <img src="{msg.userData.photoURL}" alt="user">
+                        <div class="chat-message-text">
+                            {msg.message}
+                        </div>
+                    </div>
+                {/if}
+            {/each}
+        </div>
+        <div class="chat-input">
+            <input type="text" bind:value={chatMessage} onkeypress={handleChatKeyPress}
+            placeholder="Send a message to the room...">
+            <img src="/send.png" alt="send" class="send-button"
+            onclick={() => {addNewChatMessage(id, user, chatMessage); chatMessage = ""}}>
+        </div>
     </div>
 </div>

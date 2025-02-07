@@ -4,8 +4,7 @@
 
 <style>
     .maroon {
-        /* background-color: rgb(78, 2, 2); */
-        background: url("/maroon.png");
+        background-color: rgb(112, 3, 3);
         color: white;
         box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
     }
