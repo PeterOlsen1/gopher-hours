@@ -9,6 +9,7 @@ import {
     deleteDoc,
     Timestamp,
     updateDoc,
+    onSnapshot,
 } from 'firebase/firestore';
 import { app } from './firebase';
 import { ensureAuth, user } from './auth';
@@ -330,4 +331,23 @@ export async function removeFromQueue(ohId, uid) {
     userData.currentlyQueued = false;
     userData.queuedFor = "";
     await updateDoc(userRef, userData);
+}
+
+/**
+ * Get a queue listener for the given office hour, and act accordingly 
+ * on queue update.
+ * 
+ * @param {string} ohId given office hour id 
+ * @param {function(data): null} callback do stuff with the given office hour data
+ * (including the queue)
+ * @returns 
+ */
+export async function getQueueListener(ohId, callback) {
+    const singleOhRef = doc(ohRef, ohId);
+
+    const unsubscribe = onSnapshot(singleOhRef, (querySnapshot) => {
+        callback(querySnapshot.data());
+    });
+
+    return unsubscribe;
 }
