@@ -2,7 +2,7 @@
     import Header from "$lib/components/Header.svelte";
     import { page } from "$app/state";
     import { onMount } from "svelte";
-    import { addToQueue, getQueueListener, getSingleOfficeHour, getUserData, removeFromQueue } from "$lib/firebase/db";
+    import { addToQueue, getOfficeHourListener, getSingleOfficeHour, getUserData, removeFromQueue, updateOfficeHourDescription } from "$lib/firebase/db";
     import { to12HourTime } from "$lib/utils/utils";
     import { redirectIfNotLoggedIn, user } from "$lib/firebase/auth";
     import { Timestamp } from "firebase/firestore";
@@ -17,6 +17,7 @@
     let chatMessage = $state("testing chat");
     let host = $state(false);
     let currentUid = $state("");
+    let descriptionText = $state("");
 
 
     /**
@@ -67,9 +68,8 @@
      */
     function handleEditDescription() {
         if (currentlyEditing) {
-            
+            updateOfficeHourDescription(id, descriptionText);
         }
-        
         currentlyEditing = !currentlyEditing;
     }
     
@@ -87,14 +87,17 @@
         currentUid = user.uid;
         host = user.uid === data.host.uid;
 
+        //get subscribers so we can have live-updating data
         const unsubscribeChat = getChatListener(id, handleChatMessage);
-        const unsunscribeQueue = getQueueListener(id, (returnedData) => {
+        const unsunscribeQueue = getOfficeHourListener(id, (returnedData) => {
             data = returnedData;
+            descriptionText = data.description;
             data.queue.forEach((q, idx) => {
                 q.position = idx + 1;
             });
         });
 
+        // remove subscribers on unmount
         return () => {
             unsubscribeChat();
             unsunscribeQueue();
@@ -135,16 +138,21 @@
     </div>
 
     {#if data.description}
-        <div>
+        <div class="w-full">
             <div class="soft-title">Description</div>
-            <div class="description">
+            <div class="description" style="display: {currentlyEditing ? 'none' : 'block'}">
                 {data.description}
             </div>
-            {#if host}
-                <div class="mt-3"></div>
-                <button>Edit Description</button>
-            {/if}
         </div>
+    {/if}
+
+    <!-- give host the magic description editing button -->
+    {#if host}
+        <input type="text" bind:value={descriptionText}
+        style="display: {currentlyEditing ? 'block' : 'none'}">
+        <button onclick={handleEditDescription}>
+            {currentlyEditing ? "Save" : "Edit Description"}
+        </button>
     {/if}
     <div class="queue">
         <div class="soft-title">Queue</div>
@@ -171,9 +179,8 @@
 
     <br><br><br>
     <div>
-        chat?????
-        <input type="text" style="border: 1px solid black; width: 100%; height: 50px;"
-        bind:value={chatMessage}>
+        <input type="text" bind:value={chatMessage} 
+        placeholder="Send a message to the room...">
         <button onclick={() => addNewChatMessage(id, user, chatMessage)}>Send</button>
     </div>
 </div>

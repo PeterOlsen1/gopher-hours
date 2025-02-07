@@ -334,7 +334,7 @@ export async function removeFromQueue(ohId, uid) {
 }
 
 /**
- * Get a queue listener for the given office hour, and act accordingly 
+ * Get a listener for the given office hour, and act accordingly 
  * on queue update.
  * 
  * @param {string} ohId given office hour id 
@@ -342,7 +342,7 @@ export async function removeFromQueue(ohId, uid) {
  * (including the queue)
  * @returns 
  */
-export async function getQueueListener(ohId, callback) {
+export async function getOfficeHourListener(ohId, callback) {
     const singleOhRef = doc(ohRef, ohId);
 
     const unsubscribe = onSnapshot(singleOhRef, (querySnapshot) => {
