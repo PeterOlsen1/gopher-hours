@@ -12,10 +12,10 @@ time to start learning.
 TODOS:
 * Individual office hours page
   * Queue feature (there's big potential here)
+    * Prevent from joining 2 queues at once
     * Ambitious, but send texts/emails/maybe notifications its their turn?
   * Host options to change things around, move queue around too?
 * Chat feature (no web sockets)
-  * delete messages after 24 hours
   * Give host priveliges to delete chats
 * Mobile styling (and styling in general)
   * dark mode?

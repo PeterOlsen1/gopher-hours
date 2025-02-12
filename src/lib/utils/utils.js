@@ -50,6 +50,8 @@ export function groupOfficeHoursByDate(oh) {
         });
     });
 
+    console.log(grouped);
+
     return grouped;
 }
 

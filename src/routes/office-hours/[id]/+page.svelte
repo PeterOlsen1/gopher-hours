@@ -4,7 +4,7 @@
     import { onMount } from "svelte";
     import { addToQueue, getOfficeHourListener, getSingleOfficeHour, getUserData, removeFromQueue, updateOfficeHourDescription } from "$lib/firebase/db";
     import { to12HourTime } from "$lib/utils/utils";
-    import { redirectIfNotLoggedIn, user } from "$lib/firebase/auth";
+    import { ensureAuth, redirectIfNotLoggedIn, signInWithGoogle, user } from "$lib/firebase/auth";
     import { Timestamp } from "firebase/firestore";
     import Swal from "sweetalert2";
     import { addNewChatMessage, getChatListener } from "$lib/firebase/chat";
@@ -25,6 +25,8 @@
      * Function to handle a queue join
      */
     async function handleQueueJoin() {
+        const userData = await getUserData(user.uid);
+        console.log(userData);
         for (const q of data.queue) {
             if (q.uid === user.uid) {
                 Swal.fire({
@@ -80,7 +82,6 @@
      * @param messages
      */
     function handleChatMessage(messages) {
-        console.log(messages);
         messages.sort((a, b) => a.timestamp.seconds - b.timestamp.seconds);
         chat = messages;
     }
@@ -93,7 +94,7 @@
     }
 
     onMount(async () => {
-        await redirectIfNotLoggedIn();
+        await ensureAuth();
         currentUid = user.uid;
         host = user.uid === data.host.uid;
 
@@ -184,7 +185,11 @@
             <div>No students in queue</div>
         {/if}
         <div class="loading-spinner" style="display: {loading ? 'block' : 'none'}"></div>
-        <button onclick={handleQueueJoin}>Join Queue</button>
+        {#if !currentUid}
+            <button onclick={signInWithGoogle}>Login to queue!</button>
+        {:else}
+            <button onclick={handleQueueJoin}>Join Queue</button>
+        {/if}
     </div>
 
     <br><br><br>
@@ -217,12 +222,16 @@
                 <div class="no-messages">No messages yet!</div>
             {/if}
         </div>
-        <div class="chat-input">
-            <input type="text" bind:value={chatMessage} onkeypress={handleChatKeyPress}
-            placeholder="Send a message to the room...">
-            <img src="/send.png" alt="send" class="send-button"
-            onclick={() => {addNewChatMessage(id, user, chatMessage); chatMessage = ""}}>
-        </div>
+        {#if !currentUid}
+            <button onclick={signInWithGoogle}>Login to chat!</button>
+        {:else}
+            <div class="chat-input">
+                <input type="text" bind:value={chatMessage} onkeypress={handleChatKeyPress}
+                placeholder="Send a message to the room...">
+                <img src="/send.png" alt="send" class="send-button"
+                onclick={() => {addNewChatMessage(id, user, chatMessage); chatMessage = ""}}>
+            </div>
+        {/if}
         <small style="margin-top: -1em">
             Messages are automatically deleted after 24 hours.
         </small>

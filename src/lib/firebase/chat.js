@@ -51,11 +51,19 @@ export async function addNewChatMessage(ohId, user, message) {
  */
 export async function getChatListener(ohId, callback) {
     const chatRef = collection(ohRef, ohId, 'chat');
+    const now = Timestamp.now();
+    const secondsInADay = 60 * 60 * 24;
 
     const unsubscribe = onSnapshot(chatRef, (querySnapshot) => {
         let messages = [];
         querySnapshot.forEach((doc) => {
-            messages.push(doc.data());
+            if (doc.data().timestamp.seconds < now.seconds - secondsInADay) {
+                deleteDoc(doc.ref);
+                return;
+            }
+            const data = doc.data();
+            doc.data.id = doc.id;
+            messages.push(data);
         });
         callback(messages);
     });

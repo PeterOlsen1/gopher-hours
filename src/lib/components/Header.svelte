@@ -1,5 +1,12 @@
 <script>
-    import { logout } from "$lib/firebase/auth";
+    import { ensureAuth, logout, signInWithGoogle, user } from "$lib/firebase/auth";
+    import { onMount } from "svelte";
+    
+    let loggedIn = $state(true);
+    onMount(async () => {
+        await ensureAuth();
+        loggedIn = !!user;
+    })
 </script>
 
 <style>
@@ -67,22 +74,29 @@
 <div class="w-full maroon flex justify-center">
     <div class="header">
         <div>
-            <a href="/">
+            <a href="/home">
                 <!-- <img src="/logo.png" alt="old gopher" class="old-gopher"> -->
                  <b style="font-sioze">GopherHours.</b>
             </a>
         </div>
         <div class="links">
-            <a href="/ta">
-                TA Menu
-            </a>
-            <a href="/home" class="home">
-                Home
-            </a>
-            <div class="logout" onclick={logout}>
-                Logout
-                <img src="/logout.png" alt="log out arrow" style="filter: invert(1);">
-            </div>
+            {#if loggedIn}
+                <a href="/profile">
+                    Profile
+                </a>
+                <a href="/ta">
+                    TA Menu
+                </a>
+                <div class="logout" onclick={logout}>
+                    Logout
+                    <img src="/logout.png" alt="log out arrow" style="filter: invert(1);">
+                </div>
+            {:else}
+                <div onclick={signInWithGoogle} class="logout">
+                    Login
+                    <img src="/logout.png" alt="log out arrow" style="filter: invert(1); rotate: 180deg;">
+                </div>
+            {/if}
         </div>
     </div>
 </div>

@@ -244,6 +244,10 @@ img {
               <span style="display: none;">Sign in with Google</span>
             </div>
           </button>
+          &nbsp;&nbsp;&nbsp;
+          <button class="gsi-material-button" onclick={() => goto("/home")}>
+            Continue Anonymously
+          </button>
     </div>
       {/if}
     </div>

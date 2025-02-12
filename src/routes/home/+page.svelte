@@ -7,6 +7,8 @@
     import OfficeHour from "$lib/components/OfficeHour.svelte";
     import { load } from "../office-hours/[id]/+page";
 
+    let sort_order = $state([ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']);
+
     let officeHours = $state([]);
     let originalOfficeHours = [];
     let loading = $state(true);
@@ -22,8 +24,12 @@
     }
 
     onMount(async () => {
-        await redirectIfNotLoggedIn();
         officeHours = await getAllOfficeHours();
+
+        // do some math to make it so that today shows up first
+        const today = new Date().getDay();
+        const leftover = sort_order.slice(0, today);
+        sort_order = sort_order.slice(today).concat(leftover);
         originalOfficeHours = officeHours;
         loading = false;
     });
@@ -105,10 +111,12 @@
             <br><br>
             <div class="loading-spinner"></div>
         {/if}
-        {#each Object.keys(groupedOfficeHours) as group}
-            <div class="oh-header">
-                {group}
-            </div>
+        {#each sort_order as group}
+            {#if groupedOfficeHours[group]}
+                <div class="oh-header">
+                    {group}
+                </div>
+            {/if}
             {#each groupedOfficeHours[group] as oh}
                 <OfficeHour {oh} menu={"home"}/>
             {/each}

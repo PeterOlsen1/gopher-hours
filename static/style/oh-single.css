@@ -83,7 +83,7 @@
     border-radius: 1em 1em 0 0;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
     border-bottom: 0;
-    padding-bottom: 2em;
+    padding-bottom: 3em;
     scrollbar-width: thin;
 }
 
@@ -252,5 +252,12 @@ input {
     .chat-input input {
         width: 100%;
         max-width: 100%;
+    }
+}
+
+
+@media (height > 1200px) {
+    .chatbox {
+        min-height: 30em;
     }
 }
