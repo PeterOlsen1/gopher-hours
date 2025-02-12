@@ -11,6 +11,7 @@ time to start learning.
 
 TODOS:
 * User page
+  * Updating user profile also updates all office hours and queues they are in (a lot)
 * Individual office hours page
   * Queue feature (there's big potential here)
     * Ambitious, but send texts/emails/maybe notifications its their turn?

@@ -351,3 +351,19 @@ export async function getOfficeHourListener(ohId, callback) {
 
     return unsubscribe;
 }
+
+
+/**
+ * Update the user data to the given object.
+ * 
+ * This can be kinda risky, so make sure you only modify a few
+ * properties at a time, since we can bascally rewrite the whole
+ * user object
+ * 
+ * @param {string} uid 
+ * @param {object} data 
+ */
+export async function updateUserData(uid, data) {
+    const docRef = doc(usersRef, uid);
+    await updateDoc(docRef, data);
+}

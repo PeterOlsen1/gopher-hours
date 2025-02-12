@@ -3,8 +3,10 @@
     import { onMount } from "svelte";
     
     let loggedIn = $state(true);
+    let uid = $state(null);
     onMount(async () => {
         await ensureAuth();
+        uid = user.uid;
         loggedIn = !!user;
     })
 </script>
@@ -81,7 +83,7 @@
         </div>
         <div class="links">
             {#if loggedIn}
-                <a href="/profile">
+                <a href="/user/{uid}">
                     Profile
                 </a>
                 <a href="/ta">

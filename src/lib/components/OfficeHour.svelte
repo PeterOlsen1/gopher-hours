@@ -97,7 +97,9 @@
 </style>
 
 <div class="oh-container">
-    <img src="{oh.host.photoURL}" alt="Host photo" class="host-photo">
+    {#if menu != 'user'}
+        <img src="{oh.host.photoURL}" alt="Host photo" class="host-photo">
+    {/if}
     <div class="oh-info">
         <div>
             <b>{oh.department} {oh.courseNumber}</b> -
