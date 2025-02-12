@@ -10,9 +10,9 @@ In order to user gopher hours, you must sign in to your google account,
 time to start learning.
 
 TODOS:
+* User page
 * Individual office hours page
   * Queue feature (there's big potential here)
-    * Prevent from joining 2 queues at once
     * Ambitious, but send texts/emails/maybe notifications its their turn?
   * Host options to change things around, move queue around too?
 * Chat feature (no web sockets)
@@ -20,5 +20,3 @@ TODOS:
 * Mobile styling (and styling in general)
   * dark mode?
 * Update firestore rules
-* Generate qr code for todo page?
-  * qrcode.js

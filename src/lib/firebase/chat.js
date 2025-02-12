@@ -62,7 +62,7 @@ export async function getChatListener(ohId, callback) {
                 return;
             }
             const data = doc.data();
-            doc.data.id = doc.id;
+            data.id = doc.id;
             messages.push(data);
         });
         callback(messages);

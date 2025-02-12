@@ -8,9 +8,11 @@
     import { Timestamp } from "firebase/firestore";
     import Swal from "sweetalert2";
     import { addNewChatMessage, getChatListener } from "$lib/firebase/chat";
+    import QRCode from "qrcode";
 
     const id = page.params.id;
 
+    let code;
     let loading = $state(false);
     let data = $state(page.data);
     let currentlyEditing = $state(false);
@@ -25,8 +27,6 @@
      * Function to handle a queue join
      */
     async function handleQueueJoin() {
-        const userData = await getUserData(user.uid);
-        console.log(userData);
         for (const q of data.queue) {
             if (q.uid === user.uid) {
                 Swal.fire({
@@ -39,6 +39,20 @@
                 });
                 return;
             }
+        }
+
+        const userData = await getUserData(user.uid);
+        if (userData.queuedFor) {
+            const queueData = await getSingleOfficeHour(userData.queuedFor);
+            Swal.fire({
+                title: 'Error!',
+                text: `You are already in the queue for ${queueData.department} ${queueData.courseNumber}.`,
+                icon: 'error',
+                customClass: {
+                    confirmButton: 'swal2-error-button'
+                },
+            });
+            return;
         }
         loading = true;
         await addToQueue(id, user.uid);
@@ -91,6 +105,11 @@
             addNewChatMessage(id, user, chatMessage);
             chatMessage = "";
         }
+    }
+
+    function makeQR() {
+        code.style.display = 'block';
+        QRCode.toCanvas(code, window.location.href, { errorCorrectionLevel: 'H' });
     }
 
     onMount(async () => {
@@ -164,9 +183,11 @@
         <button onclick={handleEditDescription}>
             {currentlyEditing ? "Save" : "Edit Description"}
         </button>
+        <button onclick={makeQR}>Generate QR Code</button>
     {/if}
+    <canvas id="canvas" bind:this={code} style="display: none"></canvas>
+    <div class="soft-title">Queue</div>
     <div class="queue">
-        <div class="soft-title">Queue</div>
         {#each data.queue as q}
             <div class="queue-item">
                 <b>{q.position}</b>
@@ -185,13 +206,12 @@
             <div>No students in queue</div>
         {/if}
         <div class="loading-spinner" style="display: {loading ? 'block' : 'none'}"></div>
-        {#if !currentUid}
-            <button onclick={signInWithGoogle}>Login to queue!</button>
-        {:else}
-            <button onclick={handleQueueJoin}>Join Queue</button>
-        {/if}
     </div>
-
+    {#if !currentUid}
+        <button onclick={signInWithGoogle}>Login to queue!</button>
+    {:else}
+        <button onclick={handleQueueJoin}>Join Queue</button>
+    {/if}
     <br><br><br>
     <div class="chatbox">
         <div class="chatbox-upper">

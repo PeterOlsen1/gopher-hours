@@ -37,10 +37,12 @@
 
 .queue {
     display: flex;
-    flex-direction: column;
+    /* flex-direction: column; */
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
     gap: 0.5em;
+    width: 90%;
 }
 
 .queue-item {
