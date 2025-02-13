@@ -105,89 +105,11 @@
 </script>
 
 <style>
-    .title {
-        margin-bottom: -0.2em;
-    }
-
-    form {
-        display: flex;
-        justify-content: center;
-        flex-direction: column;
-        text-align: center;
-        gap: 1em;
-    }
-
-    form input, form select, form option {
-        border: 1px solid black;
-        border-radius: 999px;
-        padding: 0.25em 0.5em;
-    }
-
-    form select {
-        padding-top: 0.5em;
-        padding-bottom: 0.5em;
-    }
-
-    .form-group {
-        display: grid;
-        grid-template-columns: 3fr 7fr;
-        align-items: center;
-    }
-
-    .form-group label {
-        text-align: right;
-        padding-right: 1em;
-        font-weight: bold;
-    }
-
-    button {
-        border: 1px solid black;
-        border-radius: 999px;
-        padding: 0.25em 1em;
-        cursor: pointer;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    button:hover {
-        background-color: #f0f0f0;
-    }
-
-    i {
-        color: red;
-    }
-
-    .oh-container {
-        width: 50%;
-        gap: 1em;
-    }
-
-    @media (max-width: 800px) {
-        form {
-            gap: 0.5em;
-            width: 85%;
-            font-size: 0.9em;
-        }
-
-        form input, form select, form option {
-            padding: 0.25em 0.5em;
-            font-size: 0.8em;
-        }
-
-        .form-group {
-            grid-template-columns: 1fr 3fr;
-        }
-
-        button {
-            padding: 0.25em 0.5em;
-            font-size: 0.9em;
-            margin-top: 0.5em;
-        }
-    }
 </style>
 
 <svelte:head>
     <title>TA Menu</title>
+    <link rel="stylesheet" href="/style/oh-form.css">
 </svelte:head>
 
 <Header />
@@ -242,7 +164,7 @@
             <input type="time" id="end-time" name="end-time" bind:value={endTime} autocomplete="off">
         </div>
         <div class="form-group">
-            <label for="description">Description</label>
+            <label for="description">Description:</label>
             <input type="text" id="description" name="description" bind:value={description} autocomplete="off" 
             placeholder="Homework 2 discussion, etc.">
         </div>

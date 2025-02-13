@@ -21,6 +21,7 @@
     let currentUid = $state("");
     let descriptionText = $state("");
     let chat = $state([]);
+    let codeShown = $state(false);
 
 
     /**
@@ -80,6 +81,12 @@
         }
     } 
 
+    function handleDescriptionChange(e) {
+        if (e.key === 'Enter') {
+            handleEditDescription();
+        }
+    }
+
     /**
      * Function to handle editing the description
      */
@@ -107,8 +114,8 @@
         }
     }
 
-    function makeQR() {
-        code.style.display = 'block';
+    function toggleQR() {
+        codeShown = !codeShown;
         QRCode.toCanvas(code, window.location.href, { errorCorrectionLevel: 'H' });
     }
 
@@ -170,22 +177,37 @@
     {#if data.description}
         <div class="w-full">
             <div class="soft-title">Description</div>
-            <div class="description" style="display: {currentlyEditing ? 'none' : 'block'}">
-                {data.description}
+            <div class="flex justify-center gap-4">
+                <div class="description" style="display: {currentlyEditing ? 'none' : 'block'}">
+                    {data.description}
+                </div>
+                {#if host}
+                    <input type="text" bind:value={descriptionText}
+                    style="display: {currentlyEditing ? 'block' : 'none'}; width: 80%"
+                    onkeypress={handleDescriptionChange}>
+                    <img onclick={handleEditDescription} src="/pencil.png" alt="edit" class="edit-button"
+                    style="display: {currentlyEditing ? 'none' : 'block'}">
+                    <img onclick={handleEditDescription} src="/arrow.png" alt="submit" 
+                    class="edit-button relative top-1"
+                    style="display: {currentlyEditing ? 'block' : 'none'}">
+                {/if}
             </div>
         </div>
     {/if}
 
     <!-- give host the magic description editing button -->
     {#if host}
-        <input type="text" bind:value={descriptionText}
+        <!-- <input type="text" bind:value={descriptionText}
         style="display: {currentlyEditing ? 'block' : 'none'}">
         <button onclick={handleEditDescription}>
             {currentlyEditing ? "Save" : "Edit Description"}
+        </button> -->
+        <button onclick={toggleQR}>{
+            codeShown ? "Hide QR Code"
+            : "Show QR Code"}
         </button>
-        <button onclick={makeQR}>Generate QR Code</button>
     {/if}
-    <canvas id="canvas" bind:this={code} style="display: none"></canvas>
+    <canvas id="canvas" bind:this={code} style="display: {codeShown ? 'block' : 'none'}"></canvas>
     <div class="soft-title">Queue</div>
     <div class="queue">
         {#each data.queue as q}
