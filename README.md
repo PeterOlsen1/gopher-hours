@@ -10,8 +10,8 @@ In order to user gopher hours, you must sign in to your google account,
 time to start learning.
 
 TODOS:
-* User page
-  * Updating user profile also updates all office hours and queues they are in (a lot)
+* Updating all stuff on user info change is weird
+* Update redundant data storage?
 * Individual office hours page
   * Queue feature (there's big potential here)
     * Ambitious, but send texts/emails/maybe notifications its their turn?

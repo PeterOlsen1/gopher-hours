@@ -218,7 +218,7 @@ img {
   <div class="flex items-center main">
     <div class="text-container">
       <h1 class="title">Gopher Hours</h1>
-      <p class="text-lg">View office hours for UMN courses, find TAs, locations, and times.</p>
+      <p class="text-lg mt-[-1em]">View office hours for UMN courses, find TAs, locations, and times.</p>
       <br><br>
       {#if loggedIn}
       <div class="w-full text-center">

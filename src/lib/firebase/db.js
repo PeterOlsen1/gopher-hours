@@ -365,5 +365,61 @@ export async function getOfficeHourListener(ohId, callback) {
  */
 export async function updateUserData(uid, data) {
     const docRef = doc(usersRef, uid);
+    const docSnap = await getDoc(docRef);
+    const userData = docSnap.data();
+    console.log(data);
+    // if (data.photoURL != userData.photoURL || data.displayName != userData.displayName) {
+        updateUserReferences(uid, data.photoURL, data.displayName);
+    // }
     await updateDoc(docRef, data);
+}
+
+/**
+ * Essentially find all instances of where a user is
+ * referneced in the database and update them
+ * 
+ * Can be:
+ * - Office hours (host, queue)
+ * - Chat (maybe don't do, lots of work + searching)
+ * - Office hours reference on user page
+ * 
+ * @param {string} uid 
+ */
+async function updateUserReferences(uid, photoUrl, displayName) {
+    //update the user's office hours, both on their profile and on the office hour
+    const userRef = doc(usersRef, uid);
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+
+    const userOh = collection(userRef, "officeHours");
+    const querySnapshot = await getDocs(userOh);
+    querySnapshot.forEach(async (doc) => {
+        const data = doc.data();
+        data.host.displayName = displayName;
+        data.host.photoUrl = photoUrl;
+        await updateDoc(doc.ref, data);
+
+        let userOhRef = doc(ohRef, data.officeHoursId);
+        let ohDoc = await getDoc(userOhRef);
+        let ohData = ohDoc.data();
+        console.log(ohData);
+        ohData.host.displayName = displayName;
+        ohData.host.photoUrl = photoUrl;
+        await updateDoc(userOhRef, ohData);
+    });
+
+    //update the office hour that they're queued for
+    if (userData.currentlyQueued) {
+        let userOhRef = doc(ohRef, userData.queuedFor);
+        let ohDoc = await getDoc(userOhRef);
+        let ohData = ohDoc.data();
+        ohData.queue = ohData.queue.map(q => {
+            if (q.uid === uid) {
+                q.displayName = displayName;
+                q.photoUrl = photoUrl;
+            }
+            return q;
+        });
+        await updateDoc(userOhRef, ohData);
+    }
 }

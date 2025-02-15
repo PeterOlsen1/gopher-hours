@@ -42,7 +42,7 @@
     input {
         width: 100%;
         border: 1px solid black;
-        border-radius: 999px; 
+        border-radius: 0.25em; 
         box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
     }
 
@@ -67,7 +67,7 @@
 
     .oh-header {
         width: 75%;
-        font-size: 2em;
+        font-size: 1.75em;
         font-weight: bold;
         margin-top: 1em;
     }
@@ -95,11 +95,12 @@
 
 <Header />
 <div class="w-full flex justify-center flex-col items-center">
+    <br><br>
     <h1 class="title">
-        Office Hours
+        Gopher Hours
     </h1>
     <div class="subtitle">
-        Find all office hours by date and time.
+        Find and queue for UMN office hours anywhere.
     </div>
     <br><br>
     <div class="search">

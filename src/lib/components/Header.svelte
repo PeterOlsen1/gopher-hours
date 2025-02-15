@@ -14,8 +14,10 @@
 <style>
     .maroon {
         background-color: rgb(112, 3, 3);
+        background: linear-gradient(270deg, rgba(112,3,3,1) 0%, rgb(120, 4, 4) 100%);
         color: white;
-        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+        /* color: rgb(0, 0, 0); */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     }
 
     .header {
