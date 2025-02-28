@@ -1,0 +1,39 @@
+.calendar {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+}
+
+.calendar-header, .week {
+    width: 100%;
+    font-weight: bold;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.week {
+    font-weight: normal;
+}
+
+.calendar-body {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+}
+
+.day {
+    border: 1px solid rgba(145, 145, 145, 0.578);
+    height: calc(100vw / 7);
+}
+
+.calendar-header .day {
+    height: auto;
+}
+
+@media (width < 600px) {
+    .calendar {
+        font-size: 0.7em;
+    }
+}
