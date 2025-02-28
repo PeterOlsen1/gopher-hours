@@ -10,14 +10,10 @@ In order to user gopher hours, you must sign in to your google account,
 time to start learning.
 
 TODOS:
-* Updating all stuff on user info change is weird
-* Update redundant data storage?
-* Individual office hours page
-  * Queue feature (there's big potential here)
-    * Ambitious, but send texts/emails/maybe notifications its their turn?
-  * Host options to change things around, move queue around too?
-* Chat feature (no web sockets)
+* Give the host the option to disable the queue?
+* Calender view
+  * This would mean we need to allow hosts to make one-time changes
+* Chat feature
   * Give host priveliges to delete chats
 * Mobile styling (and styling in general)
-  * dark mode?
 * Update firestore rules
