@@ -18,6 +18,7 @@
     let startTime = $state("");
     let endTime = $state("");
     let description = $state("");
+    let queue = $state(true);
 
     async function handleFormInput(e) {
         e.preventDefault();
@@ -58,6 +59,7 @@
             startTime,
             endTime,
             description,
+            queueEnabled: queue,
             queue : []
         }
 
@@ -167,6 +169,10 @@
             <label for="description">Description:</label>
             <input type="text" id="description" name="description" bind:value={description} autocomplete="off" 
             placeholder="Homework 2 discussion, etc.">
+        </div>
+        <div class="queue-group">
+            <label for="queue">Enable Queue?</label>
+            <input type="checkbox" id="queue" name="queue" bind:checked={queue}>
         </div>
         <button type="submit" onclick={handleFormInput}>Submit</button>
     </form>

@@ -10,10 +10,12 @@ In order to user gopher hours, you must sign in to your google account,
 time to start learning.
 
 TODOS:
-* Give the host the option to disable the queue?
+* Idk how to feel about changing profile photo
+  * Scaffolding is there, debug it
 * Calender view
   * This would mean we need to allow hosts to make one-time changes
+  * Keep a list of changes on a certain date?
 * Chat feature
-  * Give host priveliges to delete chats
+  * Give host priveliges to delete chats?
 * Mobile styling (and styling in general)
 * Update firestore rules

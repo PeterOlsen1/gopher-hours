@@ -207,32 +207,34 @@
             : "Show QR Code"}
         </button>
     {/if}
-    <canvas id="canvas" bind:this={code} style="display: {codeShown ? 'block' : 'none'}"></canvas>
-    <div class="soft-title">Queue</div>
-    <div class="queue">
-        {#each data.queue as q}
-            <div class="queue-item">
-                <b>{q.position}</b>
-                <img src="{q.photoURL}" alt="{q.name}">
-                <div class="queue-item-info">
-                    <div>{q.name || q.displayName}</div>
-                    <div>{q.email}</div>
-                    <div><b>Queued at:</b> {q.queueTime.toDate().toLocaleTimeString()}</div>
+    {#if page.data.queueEnabled}
+        <canvas id="canvas" bind:this={code} style="display: {codeShown ? 'block' : 'none'}"></canvas>
+        <div class="soft-title">Queue</div>
+        <div class="queue">
+            {#each data.queue as q}
+                <div class="queue-item">
+                    <b>{q.position}</b>
+                    <img src="{q.photoURL}" alt="{q.name}">
+                    <div class="queue-item-info">
+                        <div>{q.name || q.displayName}</div>
+                        <div>{q.email}</div>
+                        <div><b>Queued at:</b> {q.queueTime.toDate().toLocaleTimeString()}</div>
+                    </div>
+                    {#if host || currentUid == q.uid}
+                        <button onclick={() => handleQueueRemove(q.uid)}>Remove</button>
+                    {/if}
                 </div>
-                {#if host || currentUid == q.uid}
-                    <button onclick={() => handleQueueRemove(q.uid)}>Remove</button>
-                {/if}
-            </div>
-        {/each}
-        {#if data.queue && data.queue.length == 0}
-            <div>No students in queue</div>
+            {/each}
+            {#if data.queue && data.queue.length == 0}
+                <div>No students in queue</div>
+            {/if}
+            <div class="loading-spinner" style="display: {loading ? 'block' : 'none'}"></div>
+        </div>
+        {#if !currentUid}
+            <button onclick={signInWithGoogle}>Login to queue!</button>
+        {:else}
+            <button onclick={handleQueueJoin}>Join Queue</button>
         {/if}
-        <div class="loading-spinner" style="display: {loading ? 'block' : 'none'}"></div>
-    </div>
-    {#if !currentUid}
-        <button onclick={signInWithGoogle}>Login to queue!</button>
-    {:else}
-        <button onclick={handleQueueJoin}>Join Queue</button>
     {/if}
     <br><br><br>
     <div class="chatbox">

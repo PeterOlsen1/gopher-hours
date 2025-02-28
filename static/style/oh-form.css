@@ -24,6 +24,12 @@ form input, form select, form option {
     box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
 }
 
+input[type="checkbox"] {
+    box-shadow: 0;
+    height: 1.3em;
+    width: 1.3em;
+}
+
 form select {
     padding-top: 0.5em;
     padding-bottom: 0.5em;
@@ -33,6 +39,15 @@ form select {
     display: grid;
     grid-template-columns: 3fr 7fr;
     align-items: center;
+}
+
+.queue-group {
+    align-items: center;
+    text-align: center;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    gap: 1em;
 }
 
 .form-group label {
