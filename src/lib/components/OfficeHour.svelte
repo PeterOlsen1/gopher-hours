@@ -105,7 +105,7 @@
 </style>
 
 <div class="oh-container">
-    {#if menu != 'user'}
+    {#if menu != 'user' && menu != "ta"}
         <img src="{oh.host.photoURL}" alt="Host" class="host-photo">
     {/if}
     <div class="oh-info">

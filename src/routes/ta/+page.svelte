@@ -185,7 +185,7 @@
         <div class="loading-spinner"></div>
     {:then officeHours} 
         {#each officeHours as oh}
-            <OfficeHour oh={oh} menu={"user"} />
+            <OfficeHour oh={oh} menu={"ta"} />
         {/each}
         {#if officeHours.length == 0}
             <div>

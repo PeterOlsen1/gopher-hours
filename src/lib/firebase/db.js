@@ -100,7 +100,7 @@ export async function uploadNewOfficeHour(data) {
     else {
         userData.officeHours.push(docRef.id);
     }
-    await setDoc(userDoc, data);
+    await setDoc(userDoc, userData);
 
     return docRef.id;
 }
