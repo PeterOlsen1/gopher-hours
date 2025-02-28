@@ -34,6 +34,7 @@
         // const dayName = today.getDay();
         // console.log(dayName);
         const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+        // console.log(monthStart.getDay());
 
         let weekIdx = 0;
         let dayIdx = monthStart.getDay();
@@ -41,7 +42,6 @@
         for (let i = 0; i < 5; i++) {
             const week = document.querySelector(`.week-${i}`);
             for (let j = dayIdx; j < 7; j++) {
-                console.log(dayIdx);
                 const day = week.children[j];
 
                 day.innerHTML = `${dayIdx + j + weekIdx * 7}`;

@@ -11,6 +11,7 @@
     import QRCode from "qrcode";
 
     const id = page.params.id;
+    const hostData = page.data.host;
 
     let code;
     let loading = $state(false);
@@ -103,6 +104,7 @@
      * @param messages
      */
     function handleChatMessage(messages) {
+        console.log(messages.length);
         messages.sort((a, b) => a.timestamp.seconds - b.timestamp.seconds);
         chat = messages;
     }
@@ -128,6 +130,7 @@
         const unsubscribeChat = getChatListener(id, handleChatMessage);
         const unsunscribeQueue = getOfficeHourListener(id, (returnedData) => {
             data = returnedData;
+            data.host = hostData;
             descriptionText = data.description;
             data.queue.forEach((q, idx) => {
                 q.position = idx + 1;

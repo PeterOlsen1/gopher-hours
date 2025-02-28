@@ -118,7 +118,7 @@
         //make sure the user is on their own data!
         //we could show a modal here but the user could delete it and edit
         //data regardless. so just redirect instantly
-        if (user.uid != page.data.host.uid) {
+        if (user.uid != page.data.host) {
             goto("/ta");
         }
     });

@@ -88,17 +88,21 @@ export async function addNewUser(userData) {
  * @param {object} data 
  */
 export async function uploadNewOfficeHour(data) {
-    //grab host data to store in office hour object
-    const hostData = await getUserData(data.host);
-    data.host = hostData;
-
     //set the office hour document
     const docRef = await addDoc(ohRef, data);
-
+    console.log(data);
     //update the user's data to include the office hour
-    const userDoc = doc(usersRef, data.host.uid, "officeHours", docRef.id);
-    data.officeHoursId = docRef.id;
+    const userDoc = doc(usersRef, data.host);
+    const userData = (await getDoc(userDoc)).data();
+    if (!userData.officeHours) {
+        userData.officeHours = [docRef.id];
+    }
+    else {
+        userData.officeHours.push(docRef.id);
+    }
     await setDoc(userDoc, data);
+
+    return docRef.id;
 }
 
 
@@ -163,14 +167,8 @@ export async function getTAOfficeHours(uid=null) {
         uid = user.uid;
     }
 
-    const collectionRef = await collection(usersRef, uid, "officeHours");
-    const querySnapshot = await getDocs(collectionRef);
-    let oh = [];
-    querySnapshot.forEach(async (doc) => {
-        const data = doc.data();
-        data.id = doc.id;
-        oh.push(data);
-    });
+    const allOh = await getAllOfficeHours();
+    const oh = allOh.filter(oh => oh.host === uid);
 
     return oh;
 }
@@ -187,15 +185,21 @@ export async function deleteOfficeHour(ohId) {
     let docRef = doc(ohRef, ohId);
     const docSnap = await getDoc(docRef);
     const data = docSnap.data();
-    if (data.host.uid !== user.uid) {
+    console.log(data);
+    if (data.host !== user.uid) {
+        console.log('User does not have proper authorization to delete this office hour');
         return;
     }
 
     await deleteDoc(doc(ohRef, ohId));
 
     //remove the office hour from the user's data
-    docRef = doc(usersRef, user.uid, "officeHours", ohId);
-    await deleteDoc(docRef);
+    docRef = doc(usersRef, user.uid);
+    const userData = (await getDoc(docRef)).data();
+    if (userData.officeHours) {
+        userData.officeHours = userData.officeHours.filter(oh => oh !== ohId);
+    }
+    await updateDoc(docRef, userData);
 }
 
 /**
@@ -228,7 +232,7 @@ export async function updateOfficeHour(ohId, data) {
     const ohData = await getSingleOfficeHour(ohId);
 
     //check if we've got the perms
-    if (!user || user.uid !== ohData.host.uid) {
+    if (!user || user.uid !== ohData.host) {
         console.log("User does not have proper authorization to update this office hour");
         return;
     }
@@ -242,14 +246,15 @@ export async function updateOfficeHour(ohId, data) {
     await updateDoc(docRef, data);
 
     //update the user's data to include the office hour
-    const userDoc = doc(usersRef, data.host.uid, "officeHours", ohId);
-    const docSnap = await getDoc(userDoc);
-    if (!docSnap.exists()) {
-        setDoc(userDoc, data);
+    const userDoc = doc(usersRef, data.host);
+    const userData = (await getDoc(userDoc)).data();
+    if (!userData.officeHours) {
+        userData.officeHours = [ohId];
     }
-    else {
-        updateDoc(userDoc, data);
+    else if (!userData.officeHours.includes(ohId)) {
+        userData.officeHours.push(ohId);
     }
+    updateDoc(userDoc, userData);
 }
 
 /**
@@ -369,10 +374,13 @@ export async function updateUserData(uid, data) {
     const userData = docSnap.data();
     console.log(data);
     // if (data.photoURL != userData.photoURL || data.displayName != userData.displayName) {
-        updateUserReferences(uid, data.photoURL, data.displayName);
+        // updateUserReferences(uid, data.photoURL, data.displayName);
     // }
     await updateDoc(docRef, data);
 }
+
+
+
 
 /**
  * Essentially find all instances of where a user is
@@ -385,41 +393,41 @@ export async function updateUserData(uid, data) {
  * 
  * @param {string} uid 
  */
-async function updateUserReferences(uid, photoUrl, displayName) {
-    //update the user's office hours, both on their profile and on the office hour
-    const userRef = doc(usersRef, uid);
-    const userDoc = await getDoc(userRef);
-    const userData = userDoc.data();
+// async function updateUserReferences(uid, photoUrl, displayName) {
+//     //update the user's office hours, both on their profile and on the office hour
+//     const userRef = doc(usersRef, uid);
+//     const userDoc = await getDoc(userRef);
+//     const userData = userDoc.data();
 
-    const userOh = collection(userRef, "officeHours");
-    const querySnapshot = await getDocs(userOh);
-    querySnapshot.forEach(async (doc) => {
-        const data = doc.data();
-        data.host.displayName = displayName;
-        data.host.photoUrl = photoUrl;
-        await updateDoc(doc.ref, data);
+//     const userOh = collection(userRef, "officeHours");
+//     const querySnapshot = await getDocs(userOh);
+//     querySnapshot.forEach(async (doc) => {
+//         const data = doc.data();
+//         data.host.displayName = displayName;
+//         data.host.photoUrl = photoUrl;
+//         await updateDoc(doc.ref, data);
 
-        let userOhRef = doc(ohRef, data.officeHoursId);
-        let ohDoc = await getDoc(userOhRef);
-        let ohData = ohDoc.data();
-        console.log(ohData);
-        ohData.host.displayName = displayName;
-        ohData.host.photoUrl = photoUrl;
-        await updateDoc(userOhRef, ohData);
-    });
+//         let userOhRef = doc(ohRef, data.officeHoursId);
+//         let ohDoc = await getDoc(userOhRef);
+//         let ohData = ohDoc.data();
+//         console.log(ohData);
+//         ohData.host.displayName = displayName;
+//         ohData.host.photoUrl = photoUrl;
+//         await updateDoc(userOhRef, ohData);
+//     });
 
-    //update the office hour that they're queued for
-    if (userData.currentlyQueued) {
-        let userOhRef = doc(ohRef, userData.queuedFor);
-        let ohDoc = await getDoc(userOhRef);
-        let ohData = ohDoc.data();
-        ohData.queue = ohData.queue.map(q => {
-            if (q.uid === uid) {
-                q.displayName = displayName;
-                q.photoUrl = photoUrl;
-            }
-            return q;
-        });
-        await updateDoc(userOhRef, ohData);
-    }
-}
+//     //update the office hour that they're queued for
+//     if (userData.currentlyQueued) {
+//         let userOhRef = doc(ohRef, userData.queuedFor);
+//         let ohDoc = await getDoc(userOhRef);
+//         let ohData = ohDoc.data();
+//         ohData.queue = ohData.queue.map(q => {
+//             if (q.uid === uid) {
+//                 q.displayName = displayName;
+//                 q.photoUrl = photoUrl;
+//             }
+//             return q;
+//         });
+//         await updateDoc(userOhRef, ohData);
+//     }
+// }

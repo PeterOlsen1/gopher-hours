@@ -10,14 +10,14 @@
 
     let officeHours = $state(getTAOfficeHours());
 
-    let department = $state("");
-    let courseNumber = $state("");
-    let location = $state("");
+    let department = $state("csci");
+    let courseNumber = $state("4131");
+    let location = $state("lind l103");
     let link = $state("");
     let date = $state("monday");
-    let startTime = $state("");
-    let endTime = $state("");
-    let description = $state("");
+    let startTime = $state("11:00");
+    let endTime = $state("13:00");
+    let description = $state("testing");
     let queue = $state(true);
 
     async function handleFormInput(e) {
@@ -64,7 +64,7 @@
         }
 
         try {
-            await uploadNewOfficeHour(data);
+            const ohId = await uploadNewOfficeHour(data);
 
             Swal.fire({
                 title: 'Success!',
@@ -75,6 +75,7 @@
             const userData = await getUserData(user.uid);
             data.host = userData;
             let officeHoursCopy = await officeHours;
+            data.id = ohId;
             officeHoursCopy.push(data);
             officeHours = officeHoursCopy;
 
@@ -184,7 +185,7 @@
         <div class="loading-spinner"></div>
     {:then officeHours} 
         {#each officeHours as oh}
-            <OfficeHour oh={oh} menu={"ta"} />
+            <OfficeHour oh={oh} menu={"user"} />
         {/each}
         {#if officeHours.length == 0}
             <div>

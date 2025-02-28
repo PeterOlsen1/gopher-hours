@@ -13,6 +13,7 @@ import {
 } from 'firebase/firestore';
 import { app } from './firebase';
 import { ensureAuth, user } from './auth';
+import { getUserData } from './db';
 
 
 let db = getFirestore(app);
@@ -27,18 +28,11 @@ let ohRef = collection(db, 'officeHours');
  * @param {string} message chat message
  */
 export async function addNewChatMessage(ohId, user, message) {
-    const userData = {
-        displayName: user.displayName,
-        email: user.email,
-        photoURL: user.photoURL,
-        uid: user.uid
-    }
-
     const chatRef = collection(ohRef, ohId, 'chat');
     const data = {
         message: message,
         timestamp: Timestamp.now(),
-        userData
+        uid: user.uid,
     }
     const docRef = await addDoc(chatRef, data);
 }
@@ -54,17 +48,25 @@ export async function getChatListener(ohId, callback) {
     const now = Timestamp.now();
     const secondsInADay = 60 * 60 * 24;
 
-    const unsubscribe = onSnapshot(chatRef, (querySnapshot) => {
+    const unsubscribe = onSnapshot(chatRef, async (querySnapshot) => {
         let messages = [];
-        querySnapshot.forEach((doc) => {
+        for (let doc of querySnapshot.docs) {
+            //delete if older than a day
             if (doc.data().timestamp.seconds < now.seconds - secondsInADay) {
                 deleteDoc(doc.ref);
                 return;
             }
             const data = doc.data();
+
+            //append user data to the returning data
+            const uid = data.uid;
+            const userData = await getUserData(uid);
+            data.userData = userData;
+
             data.id = doc.id;
             messages.push(data);
-        });
+        }
+
         callback(messages);
     });
 

@@ -1,5 +1,7 @@
 <script>
+    import { getUserData } from "$lib/firebase/db";
     import { to12HourTime } from "$lib/utils/utils";
+    import { onMount } from "svelte";
     let { oh, menu } = $props();
 
     let link = $state("");
@@ -8,6 +10,12 @@
     } else {
         link = `/office-hours/${oh.id}`;
     }
+    
+    onMount(async () => {
+        const userData = await getUserData(oh.host);
+        console.log(userData);
+        oh.host = userData;
+    });
 </script>
 
 <style>
@@ -98,7 +106,7 @@
 
 <div class="oh-container">
     {#if menu != 'user'}
-        <img src="{oh.host.photoURL}" alt="Host photo" class="host-photo">
+        <img src="{oh.host.photoURL}" alt="Host" class="host-photo">
     {/if}
     <div class="oh-info">
         <div>
