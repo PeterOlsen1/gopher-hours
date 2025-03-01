@@ -404,3 +404,53 @@ export async function updateUserData(uid, data) {
     const userData = docSnap.data();
     await updateDoc(docRef, data);
 }
+
+/**
+ * Add an office hour to the user's favorites.
+ * 
+ * This will be useful on the calendar when we
+ * can show only favorites
+ * 
+ * @param {string} ohId 
+ */
+export async function addToFavorites(ohId) {
+    await ensureAuth();
+    const userRef = doc(usersRef, user.uid);
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+    if (!userData.favorites) {
+        userData.favorites = [ohId];
+    }
+    else {
+        userData.favorites.push(ohId);
+    }
+    await updateDoc(userRef, userData);
+
+    //update cache
+    const cache = JSON.parse(sessionStorage.getItem('userDataCache') || "{}");
+    cache[user.uid] = userData;
+    sessionStorage.setItem('userDataCache', JSON.stringify(cache));
+}
+
+/**
+ * Remove an office hour from the user's favorites
+ * 
+ * @param {string} ohId 
+ * @returns 
+ */
+export async function removeFromFavorites(ohId) {
+    await ensureAuth();
+    const userRef = doc(usersRef, user.uid);
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+    if (!userData.favorites) {
+        return;
+    }
+    userData.favorites = userData.favorites.filter(f => f !== ohId);
+    await updateDoc(userRef, userData);
+
+    //update cache
+    const cache = JSON.parse(sessionStorage.getItem('userDataCache') || "{}");
+    cache[user.uid] = userData;
+    sessionStorage.setItem('userDataCache', JSON.stringify(cache));
+}

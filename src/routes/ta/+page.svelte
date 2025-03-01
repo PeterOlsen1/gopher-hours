@@ -10,14 +10,14 @@
 
     let officeHours = $state(getTAOfficeHours());
 
-    let department = $state("csci");
-    let courseNumber = $state("4131");
-    let location = $state("lind l103");
+    let department = $state("");
+    let courseNumber = $state("");
+    let location = $state("");
     let link = $state("");
-    let date = $state("monday");
-    let startTime = $state("11:00");
-    let endTime = $state("13:00");
-    let description = $state("testing");
+    let date = $state("");
+    let startTime = $state("");
+    let endTime = $state("");
+    let description = $state("");
     let queue = $state(true);
 
     async function handleFormInput(e) {
