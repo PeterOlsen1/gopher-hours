@@ -1,5 +1,5 @@
 <script>
-    import { getUserData } from "$lib/firebase/db";
+    import { getUserDataCache } from "$lib/firebase/db";
     import { to12HourTime } from "$lib/utils/utils";
     import { onMount } from "svelte";
     let { oh, menu } = $props();
@@ -12,7 +12,7 @@
     }
     
     onMount(async () => {
-        const userData = await getUserData(oh.host);
+        const userData = await getUserDataCache(oh.host);
         console.log(userData);
         oh.host = userData;
     });

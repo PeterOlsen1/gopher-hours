@@ -2,7 +2,7 @@
     import Header from "$lib/components/Header.svelte";
     import { page } from "$app/state";
     import { onMount } from "svelte";
-    import { addToQueue, getOfficeHourListener, getSingleOfficeHour, getUserData, removeFromQueue, updateOfficeHourDescription } from "$lib/firebase/db";
+    import { addToFavorites, addToQueue, getOfficeHourListener, getSingleOfficeHour, getUserData, getUserDataCache, removeFromFavorites, removeFromQueue, updateOfficeHourDescription } from "$lib/firebase/db";
     import { to12HourTime } from "$lib/utils/utils";
     import { ensureAuth, redirectIfNotLoggedIn, signInWithGoogle, user } from "$lib/firebase/auth";
     import { Timestamp } from "firebase/firestore";
@@ -14,6 +14,7 @@
     const hostData = page.data.host;
 
     let code;
+    let favorited = $state(false);
     let loading = $state(false);
     let data = $state(page.data);
     let currentlyEditing = $state(false);
@@ -121,10 +122,26 @@
         QRCode.toCanvas(code, window.location.href, { errorCorrectionLevel: 'H' });
     }
 
+    function updateFavorite() {
+        if (favorited) {
+            removeFromFavorites(id);
+        }
+        else {
+            addToFavorites(id);
+        }
+        favorited = !favorited;
+    }
+
     onMount(async () => {
         await ensureAuth();
         currentUid = user.uid;
         host = user.uid === data.host.uid;
+        
+        //update if it is favorited
+        const currentUserData = await getUserDataCache(user.uid);
+        if (currentUserData.favorites.includes(id)) {
+            favorited = true;
+        }
 
         //get subscribers so we can have live-updating data
         const unsubscribeChat = getChatListener(id, handleChatMessage);
@@ -157,7 +174,14 @@
 </svelte:head>
 
 <div class="title">
-    {data.department} {data.courseNumber} Office Hours
+    <div>
+        {data.department} {data.courseNumber} Office Hours
+    </div>
+    {#if favorited}
+        <img src='/bookmark-solid.png' alt="remove bookmark" onclick={updateFavorite}>
+    {:else}
+        <img src='/bookmark-outline.png' alt="bookmark" onclick={updateFavorite}>
+    {/if}
 </div>
 <br>
 <div class="main">
@@ -177,6 +201,14 @@
         </div>
     </div>
 
+    {#if host}
+        <a href="/office-hours/edit/{id}?ref=oh">
+            <button>
+                Edit Office Hour
+            </button>
+        </a>
+    {/if}
+
     {#if data.description}
         <div class="w-full">
             <div class="soft-title">Description</div>
@@ -184,16 +216,6 @@
                 <div class="description" style="display: {currentlyEditing ? 'none' : 'block'}">
                     {data.description}
                 </div>
-                {#if host}
-                    <input type="text" bind:value={descriptionText}
-                    style="display: {currentlyEditing ? 'block' : 'none'}; width: 80%"
-                    onkeypress={handleDescriptionChange}>
-                    <img onclick={handleEditDescription} src="/pencil.png" alt="edit" class="edit-button"
-                    style="display: {currentlyEditing ? 'none' : 'block'}">
-                    <img onclick={handleEditDescription} src="/arrow.png" alt="submit" 
-                    class="edit-button relative top-1"
-                    style="display: {currentlyEditing ? 'block' : 'none'}">
-                {/if}
             </div>
         </div>
     {/if}

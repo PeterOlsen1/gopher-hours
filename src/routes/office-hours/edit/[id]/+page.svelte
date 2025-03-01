@@ -8,6 +8,8 @@
     import { goto } from "$app/navigation";
     import { data } from "$lib/utils/utils";
 
+    //page / url data
+    const ref = page.url.searchParams.get('ref');
     const id = page.params.id;
     let ohData = $state(page.data);
 
@@ -71,7 +73,12 @@
                 text: 'Office hours updated successfully.',
                 icon: 'success'
             });
-            goto('/ta');
+            if (ref == 'oh') {
+                goto('/office-hours/' + id);
+            }
+            else {
+                goto('/ta');
+            }
         }
         catch (e) {
             console.log("Error updating office hour: " + e);
@@ -197,7 +204,7 @@
     <br>
     <div class="flex justify-center">
         <button type="submit" onclick={handleFormInput}>Save</button>
-        <button onclick={(e) => {e.preventDefault(); goto('/ta')}}>Cancel</button>
+        <button onclick={(e) => {e.preventDefault(); if (ref == 'oh') goto('/office-hours/' + id); else goto('/ta')}}>Cancel</button>
         <button onclick={confirmDelete}>Delete</button>
     </div>
 </form>

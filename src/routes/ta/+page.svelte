@@ -2,7 +2,7 @@
     import Header from "$lib/components/Header.svelte";
     import OfficeHour from "$lib/components/OfficeHour.svelte";
     import { redirectIfNotLoggedIn } from "$lib/firebase/auth";
-    import { getAllOfficeHours, getTAOfficeHours, getUserData, uploadNewOfficeHour } from "$lib/firebase/db";
+    import { getAllOfficeHours, getTAOfficeHours, getUserDataCache, uploadNewOfficeHour } from "$lib/firebase/db";
     import { onMount } from "svelte";
     import { user } from "$lib/firebase/auth";
     import { to12HourTime } from "$lib/utils/utils";
@@ -10,14 +10,14 @@
 
     let officeHours = $state(getTAOfficeHours());
 
-    let department = $state("csci");
-    let courseNumber = $state("4131");
-    let location = $state("lind l103");
+    let department = $state("");
+    let courseNumber = $state("");
+    let location = $state("");
     let link = $state("");
-    let date = $state("monday");
-    let startTime = $state("11:00");
-    let endTime = $state("13:00");
-    let description = $state("testing");
+    let date = $state("");
+    let startTime = $state("");
+    let endTime = $state("");
+    let description = $state("");
     let queue = $state(true);
 
     async function handleFormInput(e) {
@@ -72,7 +72,7 @@
                 icon: 'success'
             });
             
-            const userData = await getUserData(user.uid);
+            const userData = await getUserDataCache(user.uid);
             data.host = userData;
             let officeHoursCopy = await officeHours;
             data.id = ohId;

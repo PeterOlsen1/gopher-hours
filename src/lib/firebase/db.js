@@ -147,7 +147,37 @@ export async function getOfficeHoursByClassQuery(query) {
 export async function getUserData(uid) {
     const docRef = doc(usersRef, uid);
     const docSnap = await getDoc(docRef);
-    return docSnap.data();
+    const data = docSnap.data();
+
+    return data;
+}   
+
+/**
+ * Get user data from the cache. Use this when we only want
+ * user profile data like name and photo
+ * 
+ * DO NOT USE THIS ON A PAGE.JS FILE, IT DOES NOT 
+ * HAVE ACCESS TO SESSION STORAGE
+ * 
+ * @param {string} uid 
+ * @returns 
+ */
+export async function getUserDataCache(uid) {
+    const cache = JSON.parse(sessionStorage.getItem('userDataCache') || "{}");
+
+    if (cache[uid]) {
+        return cache[uid];
+    }
+
+    //cache miss, get the data
+    const docRef = doc(usersRef, uid);
+    const docSnap = await getDoc(docRef);
+    const data = docSnap.data();
+
+    cache[uid] = data;
+    sessionStorage.setItem('userDataCache', JSON.stringify(cache));
+
+    return data;
 }
 
 
@@ -373,4 +403,54 @@ export async function updateUserData(uid, data) {
     const docSnap = await getDoc(docRef);
     const userData = docSnap.data();
     await updateDoc(docRef, data);
+}
+
+/**
+ * Add an office hour to the user's favorites.
+ * 
+ * This will be useful on the calendar when we
+ * can show only favorites
+ * 
+ * @param {string} ohId 
+ */
+export async function addToFavorites(ohId) {
+    await ensureAuth();
+    const userRef = doc(usersRef, user.uid);
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+    if (!userData.favorites) {
+        userData.favorites = [ohId];
+    }
+    else {
+        userData.favorites.push(ohId);
+    }
+    await updateDoc(userRef, userData);
+
+    //update cache
+    const cache = JSON.parse(sessionStorage.getItem('userDataCache') || "{}");
+    cache[user.uid] = userData;
+    sessionStorage.setItem('userDataCache', JSON.stringify(cache));
+}
+
+/**
+ * Remove an office hour from the user's favorites
+ * 
+ * @param {string} ohId 
+ * @returns 
+ */
+export async function removeFromFavorites(ohId) {
+    await ensureAuth();
+    const userRef = doc(usersRef, user.uid);
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+    if (!userData.favorites) {
+        return;
+    }
+    userData.favorites = userData.favorites.filter(f => f !== ohId);
+    await updateDoc(userRef, userData);
+
+    //update cache
+    const cache = JSON.parse(sessionStorage.getItem('userDataCache') || "{}");
+    cache[user.uid] = userData;
+    sessionStorage.setItem('userDataCache', JSON.stringify(cache));
 }
