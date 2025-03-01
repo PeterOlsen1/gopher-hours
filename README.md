@@ -10,8 +10,6 @@ In order to user gopher hours, you must sign in to your google account,
 time to start learning.
 
 TODOS:
-* IMPORTANT ISSUE
-  * one function changed my whole user profile. find out which one
 * Idk how to feel about changing profile photo
   * Update data sharing on the queue
   * Future issue (if time) cache repetitive data fetches?

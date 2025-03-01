@@ -13,7 +13,7 @@ import {
 } from 'firebase/firestore';
 import { app } from './firebase';
 import { ensureAuth, user } from './auth';
-import { getUserData } from './db';
+import { getUserDataCache } from './db';
 
 
 let db = getFirestore(app);
@@ -60,7 +60,7 @@ export async function getChatListener(ohId, callback) {
 
             //append user data to the returning data
             const uid = data.uid;
-            const userData = await getUserData(uid);
+            const userData = await getUserDataCache(uid);
             data.userData = userData;
 
             data.id = doc.id;

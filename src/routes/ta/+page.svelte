@@ -2,7 +2,7 @@
     import Header from "$lib/components/Header.svelte";
     import OfficeHour from "$lib/components/OfficeHour.svelte";
     import { redirectIfNotLoggedIn } from "$lib/firebase/auth";
-    import { getAllOfficeHours, getTAOfficeHours, getUserData, uploadNewOfficeHour } from "$lib/firebase/db";
+    import { getAllOfficeHours, getTAOfficeHours, getUserDataCache, uploadNewOfficeHour } from "$lib/firebase/db";
     import { onMount } from "svelte";
     import { user } from "$lib/firebase/auth";
     import { to12HourTime } from "$lib/utils/utils";
@@ -72,7 +72,7 @@
                 icon: 'success'
             });
             
-            const userData = await getUserData(user.uid);
+            const userData = await getUserDataCache(user.uid);
             data.host = userData;
             let officeHoursCopy = await officeHours;
             data.id = ohId;
