@@ -60,42 +60,80 @@ export function groupOfficeHoursByDate(oh) {
  * test data object. dont use up all the firestore reads!
  */
 export const data = [
-    {   
-        "id": "eRUYYscZXE6MF6Dr2zP1",
-        "startTime": "01:00",
-        "course": "CSCI 1133",
-        "date": "monday",
+    {
+        "courseNumber": "1133",
+        "queue": [],
+        "location": "Keller Atrium",
+        "startTime": "14:00",
+        "queueEnabled": true,
+        "color": [
+            47,
+            5,
+            31
+        ],
+        "host": "snVS969S9Uh6rgTRGsm8KiwivQr1",
+        "endTime": "16:00",
+        "description": "My old office hours",
+        "department": "CSCI",
+        "date": "tuesday",
         "link": "",
-        "endTime": "18:00",
-        "location": "Keller Atrium Table 4",
-        "host": {
-            "email": "olse0321@umn.edu",
-            "uid": "snVS969S9Uh6rgTRGsm8KiwivQr1",
-            "name": "Peter Olsen",
-            "lastLogin": {
-                "seconds": 1738286017,
-                "nanoseconds": 700000000
-            },
-            "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocIuL83tINGEnJFzMrilbAe4pENc4c7Nu0Ki5y04i70g6dONNIg=s96-c"
-        }
+        "id": "LWKZjusoryMTa1EyLDBS"
     },
-    {   
-        "id": "tTrDAqQhl3dZDMgNND29",
-        "startTime": "12:00",
-        "date": "wednesday",
+    {
+        "location": "Keller Basement Somewhere",
+        "startTime": "16:15",
+        "endTime": "20:15",
+        "queue": [],
+        "color": [
+            123,
+            233,
+            12
+        ],
+        "date": "monday",
+        "department": "CSCI",
+        "queueEnabled": true,
+        "description": "Binary bomb!",
+        "courseNumber": "2021",
+        "link": "",
+        "host": "snVS969S9Uh6rgTRGsm8KiwivQr1",
+        "id": "MnBRc472SJhsOYyt2O4t"
+    },
+    {
+        "host": "snVS969S9Uh6rgTRGsm8KiwivQr1",
+        "startTime": "10:00",
         "location": "Lind L103",
-        "endTime": "14:00",
-        "course": "CSCI 4131",
-        "host": {
-            "lastLogin": {
-                "seconds": 1738284738,
-                "nanoseconds": 142000000
-            },
-            "email": "olse0321@umn.edu",
-            "uid": "snVS969S9Uh6rgTRGsm8KiwivQr1",
-            "name": "Peter Olsen",
-            "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocIuL83tINGEnJFzMrilbAe4pENc4c7Nu0Ki5y04i70g6dONNIg=s96-c"
-        },
-        "link": ""
+        "link": "",
+        "description": "Some 1933 office hours",
+        "queueEnabled": true,
+        "courseNumber": "1933",
+        "department": "CSCI",
+        "queue": [],
+        "endTime": "12:00",
+        "color": [
+            98,
+            160,
+            120
+        ],
+        "date": "wednesday",
+        "id": "hmTVNraHner7jtUAPiXc"
+    },
+    {
+        "courseNumber": "4131",
+        "description": "My regular office hours",
+        "endTime": "16:00",
+        "queueEnabled": true,
+        "host": "snVS969S9Uh6rgTRGsm8KiwivQr1",
+        "startTime": "14:00",
+        "department": "CSCI",
+        "link": "",
+        "location": "Lind L103",
+        "color": [
+            246,
+            76,
+            27
+        ],
+        "queue": [],
+        "date": "wednesday",
+        "id": "pNb33Kj71goPyyV2qZ8e"
     }
-];
+]

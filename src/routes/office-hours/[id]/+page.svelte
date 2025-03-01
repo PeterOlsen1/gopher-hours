@@ -17,7 +17,6 @@
     let favorited = $state(false);
     let loading = $state(false);
     let data = $state(page.data);
-    let currentlyEditing = $state(false);
     let chatMessage = $state("");
     let host = $state(false);
     let currentUid = $state("");
@@ -47,6 +46,15 @@
         const userData = await getUserData(user.uid);
         if (userData.queuedFor) {
             const queueData = await getSingleOfficeHour(userData.queuedFor);
+
+            //bug where the office hour was deleted but the user is still queued
+            if (!queueData) {
+                loading = true;
+                await addToQueue(id, user.uid);
+                loading = false;
+                return;
+            }
+
             Swal.fire({
                 title: 'Error!',
                 text: `You are already in the queue for ${queueData.department} ${queueData.courseNumber}.`,
@@ -57,6 +65,7 @@
             });
             return;
         }
+
         loading = true;
         await addToQueue(id, user.uid);
         loading = false;
@@ -82,22 +91,6 @@
             });
         }
     } 
-
-    function handleDescriptionChange(e) {
-        if (e.key === 'Enter') {
-            handleEditDescription();
-        }
-    }
-
-    /**
-     * Function to handle editing the description
-     */
-    function handleEditDescription() {
-        if (currentlyEditing) {
-            updateOfficeHourDescription(id, descriptionText);
-        }
-        currentlyEditing = !currentlyEditing;
-    }
     
     /**
      * Function to handle an incoming chat message
@@ -212,29 +205,21 @@
     {#if data.description}
         <div class="w-full">
             <div class="soft-title">Description</div>
-            <div class="flex justify-center gap-4">
-                <div class="description" style="display: {currentlyEditing ? 'none' : 'block'}">
-                    {data.description}
-                </div>
+            <div class="description">
+                {data.description}
             </div>
         </div>
     {/if}
 
-    <!-- give host the magic description editing button -->
-    {#if host}
-        <!-- <input type="text" bind:value={descriptionText}
-        style="display: {currentlyEditing ? 'block' : 'none'}">
-        <button onclick={handleEditDescription}>
-            {currentlyEditing ? "Save" : "Edit Description"}
-        </button> -->
+    <!-- {#if host}
         <button onclick={toggleQR}>{
             codeShown ? "Hide QR Code"
             : "Show QR Code"}
         </button>
-    {/if}
+    {/if} -->
     {#if page.data.queueEnabled}
         <canvas id="canvas" bind:this={code} style="display: {codeShown ? 'block' : 'none'}"></canvas>
-        <div class="soft-title">Queue</div>
+        <div class="soft-title" style="margin-bottom: 0">Queue</div>
         <div class="queue">
             {#each data.queue as q}
                 <div class="queue-item">

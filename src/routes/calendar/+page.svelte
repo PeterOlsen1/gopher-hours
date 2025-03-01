@@ -2,9 +2,9 @@
     import Header from "$lib/components/Header.svelte";
     import { onMount } from "svelte";
     import { data, to12HourTime } from "$lib/utils/utils";
-    import { create, toDataURL } from "qrcode";
-    import { ssrExportAllKey } from "vite/module-runner";
-    import { DocumentReference } from "firebase/firestore";
+    import { page } from "$app/state";
+    import { ensureAuth, user } from "$lib/firebase/auth";
+    import { getUserData } from "$lib/firebase/db";
 
     const dates = [
         "Sunday",
@@ -16,14 +16,75 @@
         "Saturday"
     ]
 
+    //declare our state variables
+    let userData = null;
+    let loggedIn = $state(false);
     let calendar = $state(null);
     let weeks = $state([0, 1, 2, 3, 4, 5]);
-    const weeklyHours = $state([
-        [], [], [], [], [], [], []
-    ]);
+    let officeHours = $state(page.data.officeHours as any);
+    let weeklyHours = $derived.by(() => {
+        let temp = [[], [], [], [], [], [], []];
+
+        for (let officeHour of officeHours) {
+            const day = officeHour.date[0].toUpperCase() + officeHour.date.slice(1);
+            const dayIdx = dates.indexOf(day);
+            temp[dayIdx].push(officeHour);
+        }
+
+        for (let i = 0; i < 7; i++) {
+            temp[i].sort((a, b) => {
+                return a.startTime.localeCompare(b.startTime);
+            });
+        }
+
+        return temp;
+    })
+
+    let showFavorites = $state(false);
+    let showVirtual = $state(true);
+
     let today = $state(new Date());
-    today.setMonth(1);
-    today.setFullYear(2026);
+
+    function handleSearch(e) {
+        const search = e.target.value.toLowerCase();
+        officeHours = page.data.officeHours.filter(oh => {
+            let condition = JSON.stringify(oh).toLowerCase().includes(search);
+            condition ||= (oh.department + ' ' + oh.courseNumber).toLowerCase().includes(search);
+            return condition;
+        });
+    }
+
+    function handleVirtual() {
+        showVirtual = !showVirtual;
+
+        if (showVirtual) {
+            officeHours = page.data.officeHours.filter(oh => {
+                let condition = oh.location.toLowerCase().includes('virtual');
+                condition ||= oh.location.toLowerCase().includes('zoom');
+                condition ||= oh.location.toLowerCase().includes('online');
+                return condition;
+            });
+        } else {
+            officeHours = page.data.officeHours;
+        }
+    }
+
+    async function handleFavorites() {
+        if (!userData && user) {
+            //don't use the cached version since it may be outdated (favorites change often)
+            userData = await getUserData(user.uid);
+        }
+        showFavorites = !showFavorites;
+
+        if (showFavorites) {
+            let favorites = userData.favorites;
+            officeHours = page.data.officeHours.filter(oh => {
+                return favorites.includes(oh.id);
+            });
+        } else {
+            officeHours = page.data.officeHours;
+        }
+    }
 
     function nextMonth() {
         today = new Date(today.getFullYear(), today.getMonth() + 1, 1);
@@ -33,6 +94,14 @@
     function lastMonth() {
         today = new Date(today.getFullYear(), today.getMonth() - 1, 1);
         createCalendar();
+    }
+
+    function makeColorLight(officeHour) {
+        return `rgba(${officeHour.color[0]}, ${officeHour.color[1]}, ${officeHour.color[2]}, 0.2)`;
+    }
+
+    function makeColor(officeHour) {
+        return `rgb(${officeHour.color[0]}, ${officeHour.color[1]}, ${officeHour.color[2]})`;
     }
 
     /**
@@ -105,17 +174,14 @@
         }
     }
 
-    onMount(() => {
+    onMount(async () => {
         //put data into the appropriate weekly buckets
         //check for exceptions here later
-        for (let officeHour of data) {
-            const day = officeHour.date[0].toUpperCase() + officeHour.date.slice(1);
-            console.log(day);
-            const dayIdx = dates.indexOf(day);
-            weeklyHours[dayIdx].push(officeHour);
-        }
-
+        officeHours = data;
         createCalendar();
+
+        await ensureAuth();
+        loggedIn = !!user;
     });
 </script>
 
@@ -126,15 +192,16 @@
 
 <!-- define snippet since we don't really need a component here -->
 {#snippet calendarOfficeHour(officeHour)}
-    <div class="office-hour">
-        <div class="office-hour-time">
+    <a href="/office-hours/{officeHour.id}" class="office-hour"
+    style="border-color: {makeColor(officeHour)}; background-color: {makeColorLight(officeHour)}">
+        <div>
+            {officeHour.department} {officeHour.courseNumber}
+        </div>
+        <div>
             {to12HourTime(officeHour.startTime)} 
             - {to12HourTime(officeHour.endTime)}
         </div>
-        <div class="office-hour-location">
-            {officeHour.location}
-        </div>
-    </div>
+    </a>
 {/snippet}
 
 
@@ -146,10 +213,29 @@
     <div class="subtitle">
         Office Hours for {today.toLocaleString('default', { month: 'long' })} {today.getFullYear()}
     </div>
-    <div>
-        <button onclick={lastMonth}>Last Month</button>
-        <button onclick={nextMonth}>Next Month</button>
-
+    <div class="arrows">
+        <img src="/arrow.png" alt="next month" class="arrow" onclick={lastMonth} style="transform: rotate(180deg);">
+        <img src="/arrow.png" alt="last month" class="arrow" onclick={nextMonth}>
+    </div>
+    <br>
+    <div class="search">
+        <input type="text" onkeyup={handleSearch} placeholder="Search office hours by keyword...">
+        <img src="/search.png" alt="Search" class="relative right-0 top-0 w-[1.3em] h-[1.3em] left-[-2em]">
+    </div>
+    <div class="sort-by">
+        <b>Sort Options:</b>
+        <div class="sort-options">
+            <div class="sort-option">
+                {#if loggedIn}
+                    Favorites
+                    <input type="checkbox" bind:checked={showFavorites} onclick={handleFavorites}>
+                {/if}
+            </div>
+            <div class="sort-option">
+                Include Virtual
+                <input type="checkbox" bind:checked={showVirtual} onclick={handleVirtual}>
+            </div>
+        </div>
     </div>
 
     <div class="calendar" bind:this={calendar}>
@@ -170,9 +256,11 @@
                             <div class="day-header">
                                 <!-- place day number here-->
                             </div>
-                            {#each weeklyHours[j] as officeHour}
-                                {@render calendarOfficeHour(officeHour)}
-                            {/each}
+                            <div class="day-content">
+                                {#each weeklyHours[j] as officeHour}
+                                    {@render calendarOfficeHour(officeHour)}
+                                {/each}
+                            </div>
                         </div>
                     {/each}
                 </div>

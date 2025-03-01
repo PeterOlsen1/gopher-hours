@@ -19,7 +19,9 @@
     function handleSearch(e) {
         const search = e.target.value.toLowerCase();
         officeHours = originalOfficeHours.filter(oh => {
-            return JSON.stringify(oh).toLowerCase().includes(search);
+            let condition = JSON.stringify(oh).toLowerCase().includes(search);
+            condition = condition || (oh.department + ' ' + oh.courseNumber).toLowerCase().includes(search);
+            return condition;
         });
     }
 

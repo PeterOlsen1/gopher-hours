@@ -88,6 +88,9 @@
                 <a href="/user/{uid}">
                     Profile
                 </a>
+                <a href="/calendar">
+                    Calendar
+                </a>
                 <a href="/ta">
                     TA Menu
                 </a>

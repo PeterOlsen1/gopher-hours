@@ -13,7 +13,6 @@
     
     onMount(async () => {
         const userData = await getUserDataCache(oh.host);
-        console.log(userData);
         oh.host = userData;
     });
 </script>
