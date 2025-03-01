@@ -10,10 +10,6 @@ In order to user gopher hours, you must sign in to your google account,
 time to start learning.
 
 TODOS:
-* Idk how to feel about changing profile photo
-  * Update data sharing on the queue
-  * Future issue (if time) cache repetitive data fetches?
-    * namely user information (doesn't change often)
 * Calender view
   * This would mean we need to allow hosts to make one-time changes
   * Keep a list of changes on a certain date?

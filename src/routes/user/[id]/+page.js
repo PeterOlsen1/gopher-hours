@@ -1,9 +1,9 @@
-import { getTAOfficeHours, getUserDataCache } from '$lib/firebase/db';
+import { getTAOfficeHours, getUserData } from '$lib/firebase/db';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params }) {
 	try {
-        let data = await getUserDataCache(params.id);
+        let data = await getUserData(params.id);
         
         if (!Object.keys(data).length) {
             throw Error;

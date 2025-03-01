@@ -156,6 +156,9 @@ export async function getUserData(uid) {
  * Get user data from the cache. Use this when we only want
  * user profile data like name and photo
  * 
+ * DO NOT USE THIS ON A PAGE.JS FILE, IT DOES NOT 
+ * HAVE ACCESS TO SESSION STORAGE
+ * 
  * @param {string} uid 
  * @returns 
  */
@@ -166,6 +169,7 @@ export async function getUserDataCache(uid) {
         return cache[uid];
     }
 
+    //cache miss, get the data
     const docRef = doc(usersRef, uid);
     const docSnap = await getDoc(docRef);
     const data = docSnap.data();

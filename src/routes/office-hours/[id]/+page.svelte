@@ -184,7 +184,7 @@
                 <div class="description" style="display: {currentlyEditing ? 'none' : 'block'}">
                     {data.description}
                 </div>
-                {#if host}
+                <!-- {#if host}
                     <input type="text" bind:value={descriptionText}
                     style="display: {currentlyEditing ? 'block' : 'none'}; width: 80%"
                     onkeypress={handleDescriptionChange}>
@@ -193,7 +193,7 @@
                     <img onclick={handleEditDescription} src="/arrow.png" alt="submit" 
                     class="edit-button relative top-1"
                     style="display: {currentlyEditing ? 'block' : 'none'}">
-                {/if}
+                {/if} -->
             </div>
         </div>
     {/if}

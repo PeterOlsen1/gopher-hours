@@ -1,12 +1,11 @@
-import { getSingleOfficeHour, getUserDataCache } from '$lib/firebase/db.js';
+import { getSingleOfficeHour, getUserData } from '$lib/firebase/db.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params }) {
 	try {
         let data = await getSingleOfficeHour(params.id);
-        const hostData = await getUserDataCache(data.host);
+        const hostData = await getUserData(data.host);
         data.host = hostData;
-        console.log(data);
 
         if (!data) {
             throw Error;
