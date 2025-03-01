@@ -1,7 +1,10 @@
-<script>
+<script lang="ts"> //ts so i don't go insane
     import Header from "$lib/components/Header.svelte";
     import { onMount } from "svelte";
-    import { data } from "$lib/utils/utils";
+    import { data, to12HourTime } from "$lib/utils/utils";
+    import { create, toDataURL } from "qrcode";
+    import { ssrExportAllKey } from "vite/module-runner";
+    import { DocumentReference } from "firebase/firestore";
 
     const dates = [
         "Sunday",
@@ -13,10 +16,94 @@
         "Saturday"
     ]
 
-    const weeklyHours = [
+    let calendar = $state(null);
+    let weeks = $state([0, 1, 2, 3, 4, 5]);
+    const weeklyHours = $state([
         [], [], [], [], [], [], []
-    ]
+    ]);
+    let today = $state(new Date());
+    today.setMonth(1);
+    today.setFullYear(2026);
 
+    function nextMonth() {
+        today = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+        createCalendar();
+    }
+
+    function lastMonth() {
+        today = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        createCalendar();
+    }
+
+    /**
+     * Logic behind building the calendar
+     */
+    function createCalendar() {
+        weeks = [0, 1, 2, 3, 4, 5];
+
+        //get all of our dates we need
+        const date = today.getDate();   
+        const month = today.getMonth();
+        const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+        const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+        let weekStartDay = monthStart.getDay();
+        let monthOffset = monthStart.getDay();
+
+        //set starting days as invalid
+        for (let i = 0; i < weekStartDay; i++) {
+            const day = calendar.querySelector(`.week-0`).children[i];
+            day.className = 'day';
+            day.classList.add('invalid-day');
+        }
+
+        //loop over all the weeks
+        for (let i = 0; i < 6; i++) {
+            const week = calendar.querySelector(`.week-${i}`);
+            if (!week) {
+                break;
+            }
+            week.style.display = 'grid';
+
+            //loop over all days of the week
+            //start from weekStartDay since we set invalid days
+            for (let j = weekStartDay; j < 7; j++) {
+                const day = week.children[j];
+                const dayDate = j - monthOffset + 1 + i * 7;
+
+                day.id = `${month + 1}-${dayDate}-${today.getFullYear()}`;
+                day.className = 'day';
+
+                //set the date string
+                day.querySelector('.day-header')
+                    .innerHTML = `${dayDate}`;
+
+                if (dayDate === date 
+                    && month == new Date().getMonth() 
+                    && today.getFullYear() == new Date().getFullYear()) {
+                    day.classList.add('today');
+                }
+
+                //check to make sure the day is valid
+                if (dayDate > daysInMonth) {
+                    day.classList.add('invalid-day');
+
+                    //crazy edge case. feb is perfectly 4 weeks. happens in 2026 and not again until like 2032
+                    if (month == 1 && monthOffset == 0) {
+                        calendar.querySelector('.week-4').style.display = 'none';
+                    }
+
+                    //check if we need to remove last week
+                    //either last day of month is saturday or we had an invalid day week 4
+                    if (i == 4 || (i == 5 && j == 0)) {
+                        calendar.querySelector('.week-5').style.display = 'none';
+                    }
+                }
+            }
+
+            //reset weekStartDay
+            weekStartDay = 0;
+        }
+    }
 
     onMount(() => {
         //put data into the appropriate weekly buckets
@@ -28,28 +115,8 @@
             weeklyHours[dayIdx].push(officeHour);
         }
 
-        const today = new Date();
-        const date = today.getDate();
-        const month = today.getMonth();
-        // const dayName = today.getDay();
-        // console.log(dayName);
-        const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-        // console.log(monthStart.getDay());
-
-        let weekIdx = 0;
-        let dayIdx = monthStart.getDay();
-
-        for (let i = 0; i < 5; i++) {
-            const week = document.querySelector(`.week-${i}`);
-            for (let j = dayIdx; j < 7; j++) {
-                const day = week.children[j];
-
-                day.innerHTML = `${dayIdx + j + weekIdx * 7}`;
-            }
-            dayIdx = 0;
-            weekIdx++;
-        }
-    })
+        createCalendar();
+    });
 </script>
 
 <svelte:head>
@@ -57,18 +124,35 @@
     <link rel="stylesheet" href="/style/calendar.css">
 </svelte:head>
 
+<!-- define snippet since we don't really need a component here -->
+{#snippet calendarOfficeHour(officeHour)}
+    <div class="office-hour">
+        <div class="office-hour-time">
+            {to12HourTime(officeHour.startTime)} 
+            - {to12HourTime(officeHour.endTime)}
+        </div>
+        <div class="office-hour-location">
+            {officeHour.location}
+        </div>
+    </div>
+{/snippet}
+
 
 <Header></Header>
 <div class="w-full flex justify-center flex-col items-center">
     <div class="title">
         Calendar
     </div>
-    <div>
-        View Office Hours Schedule in Calendar View
+    <div class="subtitle">
+        Office Hours for {today.toLocaleString('default', { month: 'long' })} {today.getFullYear()}
     </div>
-    <br><br><br>
+    <div>
+        <button onclick={lastMonth}>Last Month</button>
+        <button onclick={nextMonth}>Next Month</button>
 
-    <div class="calendar">
+    </div>
+
+    <div class="calendar" bind:this={calendar}>
         <div class="calendar-header">
             <div class="day">Sunday</div>
             <div class="day">Monday</div>
@@ -79,51 +163,20 @@
             <div class="day">Saturday</div>
         </div>
         <div class="calendar-body">
-            <div class="week week-0">
-                <div class="day">1</div>
-                <div class="day">2</div>
-                <div class="day">3</div>
-                <div class="day">4</div>
-                <div class="day">5</div>
-                <div class="day">6</div>
-                <div class="day">7</div>
-            </div>
-            <div class="week week-1">
-                <div class="day">8</div>
-                <div class="day">9</div>
-                <div class="day">10</div>
-                <div class="day">11</div>
-                <div class="day">12</div>
-                <div class="day">13</div>
-                <div class="day">14</div>
-            </div>
-            <div class="week week-2">
-                <div class="day">15</div>
-                <div class="day">16</div>
-                <div class="day">17</div>
-                <div class="day">18</div>
-                <div class="day">19</div>
-                <div class="day">20</div>
-                <div class="day">21</div>
-            </div>
-            <div class="week week-3">
-                <div class="day">22</div>
-                <div class="day">23</div>
-                <div class="day">24</div>
-                <div class="day">25</div>
-                <div class="day">26</div>
-                <div class="day">27</div>
-                <div class="day">28</div>
-            </div>
-            <div class="week week-4">
-                <div class="day">29</div>
-                <div class="day">30</div>
-                <div class="day">31</div>
-                <div class="day">1</div>
-                <div class="day">2</div>
-                <div class="day">3</div>
-                <div class="day">4</div>
-            </div>
+            {#each weeks as i}
+                <div class="week week-{i}">
+                    {#each [0, 1, 2, 3, 4, 5, 6] as j}
+                        <div class="day">
+                            <div class="day-header">
+                                <!-- place day number here-->
+                            </div>
+                            {#each weeklyHours[j] as officeHour}
+                                {@render calendarOfficeHour(officeHour)}
+                            {/each}
+                        </div>
+                    {/each}
+                </div>
+            {/each}
         </div>
     </div>
 </div>

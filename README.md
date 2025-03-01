@@ -13,7 +13,9 @@ TODOS:
 * Calender view
   * This would mean we need to allow hosts to make one-time changes
   * Keep a list of changes on a certain date?
+* View office hours by date
 * Chat feature
   * Give host priveliges to delete chats?
 * Mobile styling (and styling in general)
 * Update firestore rules
+* Migrate to typescript? (yikes)

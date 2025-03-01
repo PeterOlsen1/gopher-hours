@@ -88,9 +88,13 @@ export async function addNewUser(userData) {
  * @param {object} data 
  */
 export async function uploadNewOfficeHour(data) {
+    //add a randomly assigned color to the data 
+    const color = [Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256)];
+    data.color = color;
+    
     //set the office hour document
     const docRef = await addDoc(ohRef, data);
-    console.log(data);
+
     //update the user's data to include the office hour
     const userDoc = doc(usersRef, data.host);
     const userData = (await getDoc(userDoc)).data();
@@ -453,4 +457,25 @@ export async function removeFromFavorites(ohId) {
     const cache = JSON.parse(sessionStorage.getItem('userDataCache') || "{}");
     cache[user.uid] = userData;
     sessionStorage.setItem('userDataCache', JSON.stringify(cache));
+}
+
+/*
+* Get data for the user's favorited office hours.
+* Used in the calendar to show only favorited office hours
+*/
+export async function getFavorites() {
+    await ensureAuth();
+    const userRef = doc(usersRef, user.uid);
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+    if (!userData.favorites) {
+        return [];
+    }
+    
+    for (let i = 0; i < userData.favorites.length; i++) {
+        const oh = await getSingleOfficeHour(userData.favorites[i]);
+        userData.favorites[i] = oh;
+    }
+
+    return userData.favorites;
 }
