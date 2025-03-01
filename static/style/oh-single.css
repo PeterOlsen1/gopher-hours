@@ -99,6 +99,7 @@
     border-bottom: 0;
     padding-bottom: 3em;
     scrollbar-width: thin;
+    margin-top: 1.5em;
 }
 
 .chatbox::-webkit-scrollbar {

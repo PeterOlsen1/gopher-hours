@@ -47,7 +47,7 @@
         if (userData.queuedFor) {
             const queueData = await getSingleOfficeHour(userData.queuedFor);
 
-            //bug where the office hour was deleted but the user is still queued
+            //case where the office hour was deleted but the user is still queued
             if (!queueData) {
                 loading = true;
                 await addToQueue(id, user.uid);
@@ -186,7 +186,14 @@
         </div>
         <div class="host-info info-2"> 
             {#if data.link} 
-                <div><a href="{data.link}"><b>Location:</b></a> {data.location}</div>
+                <div>
+                    <a href="{data.link}" target="_blank">
+                        <b>Location:</b>
+                        <span style="text-decoration: underline">
+                            {data.location}
+                        </span>
+                    </a>
+                </div>
             {:else}
                 <div><b>Location:</b> {data.location}</div>
             {/if}
@@ -246,7 +253,7 @@
             <button onclick={handleQueueJoin}>Join Queue</button>
         {/if}
     {/if}
-    <br><br><br>
+
     <div class="chatbox">
         <div class="chatbox-upper">
             {#each chat as msg}

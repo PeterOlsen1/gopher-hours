@@ -55,28 +55,20 @@
     }
 
     function handleVirtual() {
-        showVirtual = !showVirtual;
-
         if (showVirtual) {
+            officeHours = page.data.officeHours;
+        } else {
             officeHours = page.data.officeHours.filter(oh => {
                 let condition = oh.location.toLowerCase().includes('virtual');
                 condition ||= oh.location.toLowerCase().includes('zoom');
                 condition ||= oh.location.toLowerCase().includes('online');
-                return condition;
+                return !condition;
             });
-        } else {
-            officeHours = page.data.officeHours;
         }
     }
 
     async function handleFavorites() {
-        if (!userData && user) {
-            //don't use the cached version since it may be outdated (favorites change often)
-            userData = await getUserData(user.uid);
-        }
-        showFavorites = !showFavorites;
-
-        if (showFavorites) {
+        if (!showFavorites) {
             let favorites = userData.favorites;
             officeHours = page.data.officeHours.filter(oh => {
                 return favorites.includes(oh.id);
@@ -177,11 +169,12 @@
     onMount(async () => {
         //put data into the appropriate weekly buckets
         //check for exceptions here later
-        officeHours = data;
+        // officeHours = data;
         createCalendar();
 
         await ensureAuth();
         loggedIn = !!user;
+        userData = user ? await getUserData(user.uid) : null;
     });
 </script>
 
@@ -223,7 +216,7 @@
         <img src="/search.png" alt="Search" class="relative right-0 top-0 w-[1.3em] h-[1.3em] left-[-2em]">
     </div>
     <div class="sort-by">
-        <b>Sort Options:</b>
+        <b>Sort Options</b>
         <div class="sort-options">
             <div class="sort-option">
                 {#if loggedIn}

@@ -4,10 +4,10 @@ import { error } from '@sveltejs/kit';
 
 export async function load({ params }) {
     try {
-        // let temp = await getAllOfficeHours();
+        let temp = await getAllOfficeHours();
         // let temp = data;
 
-        return {officeHours: data};
+        return {officeHours: temp};
     }
     catch {
         error(500, "Calendar could not be loaded");

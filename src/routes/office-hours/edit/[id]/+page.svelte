@@ -41,10 +41,10 @@
         }
 
         //this is a stretch, but make sure they have the link if it's a zoom meeting
-        if (location.toLowerCase().includes("zoom") || location.toLowerCase().includes("online") || location.toLowerCase().includes("blended") && !link) {
+        if ((location.toLowerCase().includes("zoom") || location.toLowerCase().includes("online") || location.toLowerCase().includes("blended")) && !link) {
             Swal.fire({
                 title: 'Error!',
-                text: 'No link provided for online office hours.',
+                text: 'You need to provide a link for online office hours!.',
                 icon: 'error',
                 customClass: {
                     confirmButton: 'swal2-error-button'
@@ -165,7 +165,7 @@
     </div>
     <div class="form-group">
         <label for="link">Link (if online):</label>
-        <input type="text" id="link" name="link" bind:value={link} autocomplete="off">
+        <input type="url" id="link" name="link" bind:value={link} autocomplete="off">
     </div>
     <!-- <div> -->
         <div class="form-group">

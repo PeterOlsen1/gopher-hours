@@ -1,14 +1,17 @@
 <script>
     import Header from "$lib/components/Header.svelte";
-    import { redirectIfNotLoggedIn } from "$lib/firebase/auth";
+    import { ensureAuth, redirectIfNotLoggedIn, user } from "$lib/firebase/auth";
     import { onMount } from "svelte";
-    import { getAllOfficeHours } from "$lib/firebase/db";
+    import { getAllOfficeHours, getUserData } from "$lib/firebase/db";
     import { data, groupOfficeHoursByDate, to12HourTime } from "$lib/utils/utils";
     import OfficeHour from "$lib/components/OfficeHour.svelte";
     import { load } from "../office-hours/[id]/+page";
 
     let sort_order = $state([ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']);
-
+    let showFavorites = $state(false);
+    let showVirtual = $state(true);
+    let loggedIn = $state(false);
+    let userData = null;
     let officeHours = $state([]);
     let originalOfficeHours = [];
     let loading = $state(true);
@@ -25,6 +28,31 @@
         });
     }
 
+    function handleVirtual() {
+        if (showVirtual) {
+            officeHours = originalOfficeHours;
+        } else {
+            officeHours = originalOfficeHours.filter(oh => {
+                let condition = oh.location.toLowerCase().includes('virtual');
+                condition ||= oh.location.toLowerCase().includes('zoom');
+                condition ||= oh.location.toLowerCase().includes('online');
+                return !condition;
+            });
+        }
+    }
+
+    async function handleFavorites() {
+        if (!showFavorites) {
+            let favorites = userData.favorites;
+            console.log(favorites);
+            officeHours = originalOfficeHours.filter(oh => {
+                return favorites.includes(oh.id);
+            });
+        } else {
+            officeHours = originalOfficeHours;
+        }
+    }
+
     onMount(async () => {
         officeHours = await getAllOfficeHours();
 
@@ -34,6 +62,10 @@
         sort_order = sort_order.slice(today).concat(leftover);
         originalOfficeHours = officeHours;
         loading = false;
+
+        await ensureAuth();
+        loggedIn = !!user;
+        userData = user ? await getUserData(user.uid) : null;
     });
 </script>
 
@@ -41,7 +73,7 @@
     .title {
         margin-bottom: -0.2em;
     }
-    input {
+    input[type="text"] {
         width: 100%;
         border: 1px solid black;
         border-radius: 0.25em; 
@@ -72,6 +104,26 @@
         font-size: 1.75em;
         font-weight: bold;
         margin-top: 1em;
+    }
+
+    .sort-by {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
+        margin-top: 0.5em;
+    }
+
+    .sort-options {
+        width: 90%;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        text-align: center;
+        margin-right: auto;
+        margin-left: auto;
+        gap: 1em;
     }
 
     @media (width < 800px) {
@@ -108,6 +160,21 @@
     <div class="search">
         <input type="text" onkeyup={handleSearch} placeholder="Search office hours by keyword...">
         <img src="/search.png" alt="Search" class="relative right-0 top-0 w-[1.3em] h-[1.3em] left-[-2em]">
+    </div>
+    <div class="sort-by">
+        <b>Sort Options</b>
+        <div class="sort-options">
+            <div class="sort-option">
+                {#if loggedIn}
+                    Favorites
+                    <input type="checkbox" bind:checked={showFavorites} onclick={handleFavorites}>
+                {/if}
+            </div>
+            <div class="sort-option">
+                Include Virtual
+                <input type="checkbox" bind:checked={showVirtual} onclick={handleVirtual}>
+            </div>
+        </div>
     </div>
     <div class="main-container">
         {#if loading}
