@@ -35,13 +35,52 @@ function timeToMinutes(time) {
  * @returns 
  */
 export function groupOfficeHoursByDate(oh) {
+    let today = new Date();
+
     let grouped = {};
     oh.forEach(officeHour => {
-        const date = officeHour.date.slice(0, 1).toUpperCase() + officeHour.date.slice(1);
-        if (!grouped[date]) {
-            grouped[date] = [];
+        let exceptionFlag = false; //signifies that we already added an exception
+
+        //load exceptions
+        if (officeHour.exceptions) {
+            for (let exception of officeHour.exceptions) {
+                if (exceptionFlag) {
+                    continue;
+                }
+
+                let dateChanged = exception.dateChanged.toDate();
+                let diff = (dateChanged - today) / (1000 * 60 * 60 * 24);
+                
+                if (diff < 7) {
+                    const date = exception.date.slice(0, 1).toUpperCase() + exception.date.slice(1);
+                    if (!grouped[date]) {
+                        grouped[date] = [];
+                    }
+
+                    grouped[date].push({
+                        ...officeHour,
+                        date: exception.date,
+                        startTime: exception.startTime,
+                        endTime: exception.endTime,
+                        description: exception.description,
+                        location: exception.location,
+                        queueEnabled: exception.queueEnabled,
+                        link: exception.link,
+                        exception: true
+                    });
+
+                    exceptionFlag = true;
+                }
+            }
         }
-        grouped[date].push(officeHour);
+
+        if (!exceptionFlag) {
+            const date = officeHour.date.slice(0, 1).toUpperCase() + officeHour.date.slice(1);
+            if (!grouped[date]) {
+                grouped[date] = [];
+            }
+            grouped[date].push(officeHour);
+        }
     });
 
     Object.keys(grouped).forEach(date => {
