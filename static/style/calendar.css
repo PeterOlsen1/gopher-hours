@@ -27,7 +27,7 @@
 
 .day {
     border: 1px solid rgba(145, 145, 145, 0.578);
-    min-height: calc(100vw / 7);
+    min-height: min(10em, calc(100vw / 7));
 }
 
 .day-header {
@@ -73,6 +73,8 @@
     display: flex;
     justify-content: center;
     gap: 1em;
+    text-align: center;
+    align-items: center;
 }
 
 .arrow {
@@ -118,9 +120,13 @@ input[type="text"] {
     gap: 1em;
 }
 
+.sort-option {
+    align-items: center;
+}
+
 @media (width < 600px) {
     .calendar {
-        font-size: 0.35em;
+        font-size: 0.5em;
         margin-top: 2em;
     }
 
@@ -130,5 +136,17 @@ input[type="text"] {
 
     .arrow {
         width: 1.5em;
+    }
+
+    .sort-by {
+        font-size: 0.6em;
+    }
+    
+    .sort-by input {
+        width: 1em;
+    }
+    .search {
+        width: 80%;
+        font-size: 0.6em;
     }
 }

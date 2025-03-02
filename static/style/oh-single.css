@@ -100,6 +100,9 @@
     padding-bottom: 3em;
     scrollbar-width: thin;
     margin-top: 1.5em;
+    height: 0; 
+
+    transition: height 0.5s;
 }
 
 .chatbox::-webkit-scrollbar {
@@ -218,6 +221,10 @@ input {
 @media (width < 1200px) {
     .host {
         width: 80%;
+    }
+
+    .chatbox {
+        height: auto;
     }
 }
 

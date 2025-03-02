@@ -201,8 +201,7 @@
         <label for="queue">Enable Queue?</label>
         <input type="checkbox" id="queue" name="queue" bind:checked={queueEnabled}>
     </div>
-    <br>
-    <div class="flex justify-center">
+    <div class="flex justify-center w-auto">
         <button type="submit" onclick={handleFormInput}>Save</button>
         <button onclick={(e) => {e.preventDefault(); if (ref == 'oh') goto('/office-hours/' + id); else goto('/ta')}}>Cancel</button>
         <button onclick={confirmDelete}>Delete</button>

@@ -6,7 +6,7 @@
     let uid = $state(null);
     onMount(async () => {
         await ensureAuth();
-        uid = user.uid;
+        uid = user ? user.uid : null;
         loggedIn = !!user;
     })
 </script>
@@ -69,7 +69,7 @@
         }
 
         .header {
-            font-size: 0.9em;
+            font-size: 0.7em;
         }
     }
 </style>
@@ -84,12 +84,12 @@
             </a>
         </div>
         <div class="links">
+            <a href="/calendar">
+                Calendar
+            </a>
             {#if loggedIn}
                 <a href="/user/{uid}">
                     Profile
-                </a>
-                <a href="/calendar">
-                    Calendar
                 </a>
                 <a href="/ta">
                     TA Menu

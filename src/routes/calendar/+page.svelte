@@ -55,7 +55,7 @@
     }
 
     function handleVirtual() {
-        if (showVirtual) {
+        if (!showVirtual) {
             officeHours = page.data.officeHours;
         } else {
             officeHours = page.data.officeHours.filter(oh => {
@@ -203,15 +203,13 @@
     <div class="title">
         Calendar
     </div>
-    <div class="subtitle">
-        Office Hours for {today.toLocaleString('default', { month: 'long' })} {today.getFullYear()}
-    </div>
-    <div class="arrows">
+    <div class="subtitle arrows">
         <img src="/arrow.png" alt="next month" class="arrow" onclick={lastMonth} style="transform: rotate(180deg);">
+        {today.toLocaleString('default', { month: 'long' })} {today.getFullYear()}
         <img src="/arrow.png" alt="last month" class="arrow" onclick={nextMonth}>
     </div>
-    <br>
-    <div class="search">
+
+    <div class="search mt-10">
         <input type="text" onkeyup={handleSearch} placeholder="Search office hours by keyword...">
         <img src="/search.png" alt="Search" class="relative right-0 top-0 w-[1.3em] h-[1.3em] left-[-2em]">
     </div>

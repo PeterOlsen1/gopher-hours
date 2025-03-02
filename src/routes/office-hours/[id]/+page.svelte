@@ -14,6 +14,7 @@
     const hostData = page.data.host;
 
     let code;
+    let chatbox;
     let favorited = $state(false);
     let loading = $state(false);
     let data = $state(page.data);
@@ -126,14 +127,22 @@
     }
 
     onMount(async () => {
+        if (window.innerWidth >= 800) {
+            let windowHeight = window.innerHeight;
+            let chatboxTop = chatbox.getBoundingClientRect().top;
+            chatbox.style.height = `calc(${windowHeight - chatboxTop}px)`;
+        }
+
         await ensureAuth();
-        currentUid = user.uid;
-        host = user.uid === data.host.uid;
+        currentUid = user ? user.uid : "";
+        host = currentUid === data.host.uid;
         
-        //update if it is favorited
-        const currentUserData = await getUserDataCache(user.uid);
-        if (currentUserData.favorites.includes(id)) {
-            favorited = true;
+        if (currentUid) {
+            //update if it is favorited
+            const currentUserData = await getUserDataCache(currentUid);
+            if (currentUserData.favorites.includes(id)) {
+                favorited = true;
+            }
         }
 
         //get subscribers so we can have live-updating data
@@ -170,10 +179,12 @@
     <div>
         {data.department} {data.courseNumber} Office Hours
     </div>
-    {#if favorited}
-        <img src='/bookmark-solid.png' alt="remove bookmark" onclick={updateFavorite}>
-    {:else}
-        <img src='/bookmark-outline.png' alt="bookmark" onclick={updateFavorite}>
+    {#if currentUid}
+        {#if favorited}
+            <img src='/bookmark.svg' alt="remove bookmark" onclick={updateFavorite}>
+        {:else}
+            <img src='/bookmark-outline.svg' alt="bookmark" onclick={updateFavorite}>
+        {/if}
     {/if}
 </div>
 <br>
@@ -253,8 +264,8 @@
             <button onclick={handleQueueJoin}>Join Queue</button>
         {/if}
     {/if}
-
-    <div class="chatbox">
+    <br class="flex-1">
+    <div class="chatbox" bind:this={chatbox}>
         <div class="chatbox-upper">
             {#each chat as msg}
                 {#if msg.userData.uid == user.uid}
