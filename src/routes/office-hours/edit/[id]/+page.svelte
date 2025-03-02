@@ -6,7 +6,7 @@
     import { redirectIfNotLoggedIn, user } from "$lib/firebase/auth";
     import Swal from "sweetalert2";
     import { goto } from "$app/navigation";
-    import { data } from "$lib/utils/utils";
+    import { data, to12HourTime } from "$lib/utils/utils";
 
     const dates = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
@@ -51,7 +51,12 @@
         }
 
         //this is a stretch, but make sure they have the link if it's a zoom meeting
-        if ((location.toLowerCase().includes("zoom") || location.toLowerCase().includes("online") || location.toLowerCase().includes("blended")) && !link) {
+        let lowerCase = location.toLowerCase();
+        let isOnline = lowerCase.includes("zoom") || 
+            lowerCase.includes("online") || 
+            lowerCase.includes("blended") || 
+            lowerCase.includes('virtual');
+        if (isOnline && !link) {
             Swal.fire({
                 title: 'Error!',
                 text: 'You need to provide a link for online office hours!.',
@@ -119,7 +124,12 @@
             return;
         }
 
-        if ((locationMod.toLowerCase().includes("zoom") || locationMod.toLowerCase().includes("online") || locationMod.toLowerCase().includes("blended")) && !linkMod) {
+        let lowerCase = locationMod.toLowerCase();
+        let isOnline = lowerCase.includes("zoom") || 
+            lowerCase.includes("online") || 
+            lowerCase.includes("blended") || 
+            lowerCase.includes('virtual');
+        if (isOnline && !linkMod) {
             Swal.fire({
                 title: 'Error!',
                 text: 'You need to provide a link for online office hours!.',
@@ -180,6 +190,27 @@
         if (result.isConfirmed) {
             deleteOfficeHour(id);
             goto('/ta');
+        }
+    }
+
+    async function deleteException(exception) {
+        let result = await Swal.fire({
+            title: 'Warning!',
+            text: 'Deleting an exception can not be undone!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Confirm',
+            cancelButtonText: 'Cancel', 
+            customClass: {
+                confirmButton: 'custom-confirm-button', 
+                cancelButton: 'custom-cancel-button'
+            },
+            buttonsStyling: false
+        });
+
+        if (result.isConfirmed) {
+            //delete the exception
+            console.log('deleting exception');
         }
     }
 
@@ -334,4 +365,17 @@
     </div>
 </form>
 <br><br><br>
-display previous edits to office hour here (automatically delete any after a certain time)
+<div class="soft-title" style="margin-bottom: 0;">
+    Exceptions
+</div>
+<div class="subtitle">
+    Click on an exception to delete it
+</div>
+<br>
+{#each page.data.exceptions as exception}
+    <div class="exception" onclick={() => deleteException(exception)}>
+        <p><b>Week of:</b> {exception.dateChanged.toDate().toString().split(' ').splice(0, 3).join(' ')}</p>
+        <p>{exception.location} - {to12HourTime(exception.startTime)} - {to12HourTime(exception.endTime)}</p>
+    </div>
+{/each}
+<br><br>

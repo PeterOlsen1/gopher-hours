@@ -74,6 +74,15 @@ i {
     gap: 1em;
 }
 
+.exception {
+    /* width: ; */
+    padding: 0.5em;
+    text-align: center;
+    border: 1px solid black;
+    cursor: pointer;
+    border-radius: 0.25em;
+}
+
 
 @media (max-width: 800px) {
     .title {
@@ -109,5 +118,13 @@ i {
         padding: 0.25em 0.5em;
         font-size: 0.9em;
         margin-top: 0.5em;
+    }
+
+    .exception {
+        font-size: 0.7em;
+        border-radius: 0;
+        width: 100%;
+        border-left: 0;
+        border-right: 0;
     }
 }

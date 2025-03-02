@@ -10,11 +10,14 @@
     import { addNewChatMessage, getChatListener } from "$lib/firebase/chat";
     import QRCode from "qrcode";
 
+    const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+
     const id = page.params.id;
     const hostData = page.data.host;
 
     let code;
     let chatbox;
+    let googleCalendarLink = $state('');
     let favorited = $state(false);
     let loading = $state(false);
     let data = $state(page.data);
@@ -145,6 +148,24 @@
             }
         }
 
+        //generate google calendar link
+        const ohDayIdx = days.indexOf(page.data.date);
+        console.log(ohDayIdx);
+        const startTime = new Date();
+        startTime.setDate(startTime.getDate() + (ohDayIdx - startTime.getDay() + 7) % 7);
+        startTime.setHours(data.startTime.split(":")[0]);
+        startTime.setMinutes(data.startTime.split(":")[1]);
+        startTime.setSeconds(0);
+
+        const endTime = new Date(startTime);
+        endTime.setHours(data.endTime.split(":")[0]);
+        endTime.setMinutes(data.endTime.split(":")[1]);
+        endTime.setSeconds(0);
+
+        googleCalendarLink = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${page.data.department}+${page.data.courseNumber}+Office+Hours
+&dates=${startTime.toISOString().replace(/-|:|\.\d+/g, '')}%2F${endTime.toISOString().replace(/-|:|\.\d+/g, '')}
+&details=${page.data.description}&location=${page.data.location}`;
+
         //get subscribers so we can have live-updating data
         const unsubscribeChat = getChatListener(id, handleChatMessage);
         const unsunscribeQueue = getOfficeHourListener(id, (returnedData) => {
@@ -200,7 +221,11 @@
         <b style="color: red">*</b>This week's office hour was updated from its original schedule.
     </div>
 {/if}
+<a href={googleCalendarLink} class="subtitle" target="_blank" style="text-decoration: underline;">
+    Add to Google Calendar
+</a>
 <br>
+
 <div class="main">
     <div class="host">
         <img src={data.host.photoURL} alt="host" />

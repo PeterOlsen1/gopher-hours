@@ -14,8 +14,8 @@ TODOS:
 * Exceptions
   * Exception system seems kinda sucky (changing description of individual office hours)
   * Delete option
+  * Exception option to delete office hour (for the week)
 * Calender view
-  * export to gcal?
   * User customization of colors?
 * Chat feature
   * Give host priveliges to delete chats?
