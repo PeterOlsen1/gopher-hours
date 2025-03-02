@@ -29,7 +29,7 @@
     }
 
     function handleVirtual() {
-        if (showVirtual) {
+        if (!showVirtual) {
             officeHours = originalOfficeHours;
         } else {
             officeHours = originalOfficeHours.filter(oh => {
