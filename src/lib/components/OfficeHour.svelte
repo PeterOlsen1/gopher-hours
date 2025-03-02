@@ -9,6 +9,9 @@
         link = `/office-hours/edit/${oh.id}`;
     } else {
         link = `/office-hours/${oh.id}`;
+        if (oh.exception) {
+            link += `?exception=${oh.exceptionDate}`;
+        }
     }
     
     //sometimes host data is passed in as a uid reference

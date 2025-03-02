@@ -140,6 +140,14 @@
             width: 80%;
             font-size: 0.8em;
         }
+
+        .sort-by {
+            font-size: 0.8em;
+
+            input {
+                width: 1em;
+            }
+        }
     }
 </style>
 

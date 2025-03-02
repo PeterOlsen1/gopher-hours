@@ -105,9 +105,18 @@ button:hover {
     font-weight: 500;
 }
 
+.subtitle {
+    font-size: 1em;
+    text-align: center;
+}
+
 @media (max-width: 800px) {
     .title {
         font-size: 1.8em;
+    }
+
+    .subtitle {
+        font-size: 0.7em;
     }
 
     .soft-title {

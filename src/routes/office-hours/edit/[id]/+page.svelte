@@ -235,13 +235,13 @@
         <div class="form-group">
             <label for="date"><i>*</i>Day:</label>
             <select id="date" name="date" bind:value={date}>
+                <option value="sunday">Sunday</option>
                 <option value="monday">Monday</option>
                 <option value="tuesday">Tuesday</option>
                 <option value="wednesday">Wednesday</option>
                 <option value="thursday">Thursday</option>
                 <option value="friday">Friday</option>
                 <option value="saturday">Saturday</option>
-                <option value="sunday">Sunday</option>
             </select>
         </div>
         <!-- <div class="max-w-full">
@@ -280,6 +280,9 @@
 <div class="subtitle">
     Plan ahead--modify an office hour ahead of time
 </div>
+<div class="subtitle">
+    Try to only use these when making one off time/date/location changes
+</div>
 <br><br>
 <form>
     <div class="form-group">
@@ -299,13 +302,13 @@
         <div class="form-group">
             <label for="date"><i>*</i>Day:</label>
             <select id="date" name="date" bind:value={dateMod}>
+                <option value="sunday">Sunday</option>
                 <option value="monday">Monday</option>
                 <option value="tuesday">Tuesday</option>
                 <option value="wednesday">Wednesday</option>
                 <option value="thursday">Thursday</option>
                 <option value="friday">Friday</option>
                 <option value="saturday">Saturday</option>
-                <option value="sunday">Sunday</option>
             </select>
         </div>
     <div class="form-group">

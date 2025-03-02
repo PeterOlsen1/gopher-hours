@@ -122,6 +122,8 @@ input[type="text"] {
 
 .sort-option {
     align-items: center;
+    display: flex;
+    gap: 0.5em;
 }
 
 @media (width < 600px) {

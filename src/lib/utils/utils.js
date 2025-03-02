@@ -32,10 +32,15 @@ function timeToMinutes(time) {
  * Group office hours object by date
  * 
  * @param {object} oh 
+ * @param {date} weekOf - the week of the office hours we are fetching for
  * @returns 
  */
-export function groupOfficeHoursByDate(oh) {
+export function groupOfficeHoursByDate(oh, weekOf=null) {
+    //user passed in a custom date that wasn't today, change it
     let today = new Date();
+    if (weekOf) {
+        today = weekOf;
+    }
 
     let grouped = {};
     oh.forEach(officeHour => {
@@ -51,7 +56,7 @@ export function groupOfficeHoursByDate(oh) {
                 let dateChanged = exception.dateChanged.toDate();
                 let diff = (dateChanged - today) / (1000 * 60 * 60 * 24);
                 
-                if (diff < 7) {
+                if (diff < 7 && diff >= 0) {
                     const date = exception.date.slice(0, 1).toUpperCase() + exception.date.slice(1);
                     if (!grouped[date]) {
                         grouped[date] = [];
@@ -66,6 +71,7 @@ export function groupOfficeHoursByDate(oh) {
                         location: exception.location,
                         queueEnabled: exception.queueEnabled,
                         link: exception.link,
+                        exceptionDate: dateChanged,
                         exception: true
                     });
 

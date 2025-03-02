@@ -1,7 +1,7 @@
 <script lang="ts"> //ts so i don't go insane
     import Header from "$lib/components/Header.svelte";
     import { onMount } from "svelte";
-    import { data, to12HourTime } from "$lib/utils/utils";
+    import { data, to12HourTime, groupOfficeHoursByDate } from "$lib/utils/utils";
     import { page } from "$app/state";
     import { ensureAuth, user } from "$lib/firebase/auth";
     import { getUserData } from "$lib/firebase/db";
@@ -23,21 +23,7 @@
     let weeks = $state([0, 1, 2, 3, 4, 5]);
     let officeHours = $state(page.data.officeHours as any);
     let weeklyHours = $derived.by(() => {
-        let temp = [[], [], [], [], [], [], []];
-
-        for (let officeHour of officeHours) {
-            const day = officeHour.date[0].toUpperCase() + officeHour.date.slice(1);
-            const dayIdx = dates.indexOf(day);
-            temp[dayIdx].push(officeHour);
-        }
-
-        for (let i = 0; i < 7; i++) {
-            temp[i].sort((a, b) => {
-                return a.startTime.localeCompare(b.startTime);
-            });
-        }
-
-        return temp;
+        return groupOfficeHoursByDate(officeHours);
     })
 
     let showFavorites = $state(false);
@@ -167,9 +153,6 @@
     }
 
     onMount(async () => {
-        //put data into the appropriate weekly buckets
-        //check for exceptions here later
-        // officeHours = data;
         createCalendar();
 
         await ensureAuth();
@@ -185,7 +168,8 @@
 
 <!-- define snippet since we don't really need a component here -->
 {#snippet calendarOfficeHour(officeHour)}
-    <a href="/office-hours/{officeHour.id}" class="office-hour"
+    {@const link = officeHour.exception ? `/office-hours/${officeHour.id}?exception=${officeHour.exceptionDate}` : `/office-hours/${officeHour.id}`}
+    <a href={link} class="office-hour"
     style="border-color: {makeColor(officeHour)}; background-color: {makeColorLight(officeHour)}">
         <div>
             {officeHour.department} {officeHour.courseNumber}
@@ -241,14 +225,16 @@
         </div>
         <div class="calendar-body">
             {#each weeks as i}
+                <!-- this is some weird math. Basically, pass this function a 'date' that corresponds to the sunday of the given week -->
+                {@const weeksHours = groupOfficeHoursByDate(officeHours, new Date(today.getFullYear(), today.getMonth(), (i - 1) * 7 + 2))}
                 <div class="week week-{i}">
                     {#each [0, 1, 2, 3, 4, 5, 6] as j}
                         <div class="day">
                             <div class="day-header">
-                                <!-- place day number here-->
+                                <!-- day number is placed here -->
                             </div>
                             <div class="day-content">
-                                {#each weeklyHours[j] as officeHour}
+                                {#each weeksHours[dates[j]] as officeHour}
                                     {@render calendarOfficeHour(officeHour)}
                                 {/each}
                             </div>

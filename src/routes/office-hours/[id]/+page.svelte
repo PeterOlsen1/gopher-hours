@@ -148,9 +148,16 @@
         //get subscribers so we can have live-updating data
         const unsubscribeChat = getChatListener(id, handleChatMessage);
         const unsunscribeQueue = getOfficeHourListener(id, (returnedData) => {
-            data = returnedData;
-            data.host = hostData;
-            descriptionText = data.description;
+            //dont update this if the host made an exception
+            if (!page.data.exception) {
+                data = returnedData;
+                data.host = hostData;
+                descriptionText = data.description;
+            }
+            else {
+                data.queue = returnedData.queue;
+            }
+
             data.queue.forEach((q, idx) => {
                 q.position = idx + 1;
             });
@@ -166,6 +173,7 @@
 
 <style>
 /* moved to oh-single.css for length purposes */
+/* svelte freaks out if we remove this. so just dont i guess */
 </style>
 
 <Header />
@@ -187,6 +195,11 @@
         {/if}
     {/if}
 </div>
+{#if data.exception}
+    <div class="subtitle">
+        <b style="color: red">*</b>This week's office hour was updated from its original schedule.
+    </div>
+{/if}
 <br>
 <div class="main">
     <div class="host">
