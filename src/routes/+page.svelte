@@ -150,6 +150,11 @@ img {
   position: relative;
 }
 
+.description {
+  margin-top: -1em;
+  margin-bottom: 2em;
+}
+
 @media (height < 900px) {
   img {
     height: 40em;
@@ -205,6 +210,11 @@ img {
   .text-container {
     order: 2;
   }
+
+  .description {
+    margin-top: 0;
+    margin-bottom: 1em;
+  }
 }
 </style>
 
@@ -212,14 +222,15 @@ img {
     <title>Gopher Hours: UMN Office Hours</title>
     <meta name="description" content="A site for UMN students to view office hours for their courses and connect with their TAs.">
     <meta name="keywords" content="university of minnesota, gopher, gopher hours, umn, office hours, TAs, courses, university">
+    <meta name="google-site-verification" content="chHvXO91d-Rk1awPqNjNhkZsT0WB7Y3kaA38g69KVfk" />
 </svelte:head>
 <div class="w-full h-screen flex flex-col justify-center items-center">
 
   <div class="flex items-center main">
     <div class="text-container">
       <h1 class="title">Gopher Hours</h1>
-      <p class="text-lg mt-[-1em]">View office hours for UMN courses, find TAs, locations, and times.</p>
-      <br><br>
+      <p class="text-lg description">View office hours for UMN courses, find TAs, locations, and times.</p>
+      <!-- <br><br> -->
       {#if loggedIn}
       <div class="w-full text-center">
         <button class="gsi-material-button" onclick={() => goto("/home")}>
