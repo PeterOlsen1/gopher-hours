@@ -479,3 +479,25 @@ export async function getFavorites() {
 
     return userData.favorites;
 }
+
+/**
+ * an 'exception' is a case where
+ * a TA modifies their office hours for a given
+ * week
+ * 
+ * @param {string} ohId 
+ * @param {object} data 
+ */
+export async function uploadException(ohId, data) {
+    const ohData = await getSingleOfficeHour(ohId);
+
+    if (!ohData.exceptions) {
+        ohData.exceptions = [data];
+    }
+    else {
+        ohData.exceptions.push(data);
+    }
+
+    const ohDocRef = doc(ohRef, ohId);
+    await updateDoc(ohDocRef, ohData);
+}

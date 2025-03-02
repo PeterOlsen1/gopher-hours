@@ -29,7 +29,7 @@ body, html {
 
 button {
     border: 1px solid black;
-    border-radius: 999px;
+    border-radius: 0.25em;
     padding: 0.25em 1em;
     cursor: pointer;
     margin-left: auto;

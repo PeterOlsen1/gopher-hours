@@ -2,11 +2,13 @@
     import Header from "$lib/components/Header.svelte";
     import { page } from "$app/state";
     import { onMount } from "svelte";
-    import { deleteOfficeHour, getSingleOfficeHour, updateOfficeHour } from "$lib/firebase/db";
+    import { deleteOfficeHour, getSingleOfficeHour, updateOfficeHour, uploadException } from "$lib/firebase/db";
     import { redirectIfNotLoggedIn, user } from "$lib/firebase/auth";
     import Swal from "sweetalert2";
     import { goto } from "$app/navigation";
     import { data } from "$lib/utils/utils";
+
+    const dates = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
     //page / url data
     const ref = page.url.searchParams.get('ref');
@@ -23,11 +25,19 @@
     let description = $state(ohData.description);
     let queueEnabled = $state(ohData.queueEnabled);
 
+
+    let locationMod = $state(ohData.location);
+    let linkMod = $state(ohData.link);
+    let dateMod = $state(ohData.date);
+    let startTimeMod = $state(ohData.startTime);
+    let endTimeMod = $state(ohData.endTime);
+    let descriptionMod = $state(ohData.description);
+    let queueEnabledMod = $state(ohData.queueEnabled);
+    let originalWeek = $state('');
+
     async function handleFormInput(e) {
         e.preventDefault();
 
-        console.log(startTime);
-        //make fancy later
         if (!department || !courseNumber || !location || !date || !startTime || !endTime) {
             Swal.fire({
                 title: 'Error!',
@@ -93,6 +103,60 @@
         }
     }
 
+    async function handleModInput(e) {
+        e.preventDefault();
+        console.log('modifying');
+
+        if (!originalWeek || !locationMod || !dateMod || !startTimeMod || !endTimeMod) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Required fields are missing.',
+                icon: 'error',
+                customClass: {
+                    confirmButton: 'swal2-error-button'
+                },
+            });
+            return;
+        }
+
+        if ((locationMod.toLowerCase().includes("zoom") || locationMod.toLowerCase().includes("online") || locationMod.toLowerCase().includes("blended")) && !linkMod) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'You need to provide a link for online office hours!.',
+                icon: 'error',
+                customClass: {
+                    confirmButton: 'swal2-error-button'
+                },
+            });
+            return;
+        }
+
+        //do some math to get the week the user requested
+        const date = new Date(originalWeek);
+        date.setDate(date.getDate() + 1);
+        let dateDifference = date.getDay() - dates.indexOf(dateMod);
+        date.setDate(date.getDate() - dateDifference);
+
+        const exceptionData = {
+            host: user.uid,
+            location: locationMod,
+            link: linkMod,
+            date: dateMod,
+            startTime: startTimeMod,
+            endTime: endTimeMod,
+            description: descriptionMod,
+            queueEnabled: queueEnabledMod,
+            dateChanged: date
+        }
+
+        uploadException(id, exceptionData);
+        Swal.fire({
+            title: 'Success!',
+            text: 'Modification uploaded successfully.',
+            icon: 'success'
+        });
+    }
+
     /**
      * Make sure they know what they are doing
      */
@@ -144,10 +208,10 @@
 <Header />
 
 <div class="title">
-    Edit Office Hours
+    Edit All Office Hours
 </div>
-<div>
-    Edit information for an existing office hour
+<div class="subtitle">
+    Edit information for an existing office hour, applying to all weeks
 </div>
 <br><br>
 <form>
@@ -201,10 +265,70 @@
         <label for="queue">Enable Queue?</label>
         <input type="checkbox" id="queue" name="queue" bind:checked={queueEnabled}>
     </div>
-    <div class="flex justify-center w-auto">
+    <div class="button-container">
         <button type="submit" onclick={handleFormInput}>Save</button>
         <button onclick={(e) => {e.preventDefault(); if (ref == 'oh') goto('/office-hours/' + id); else goto('/ta')}}>Cancel</button>
         <button onclick={confirmDelete}>Delete</button>
     </div>
 </form>
+
+
+<br><br>
+<div class="title">
+    Change Office Hour
+</div>
+<div class="subtitle">
+    Plan ahead--modify an office hour ahead of time
+</div>
+<br><br>
+<form>
+    <div class="form-group">
+        <label for="originalDate"><i>*</i>Week Of:</label>
+        <input type="date" id="originalDate" name="originalDate" bind:value={originalWeek} autocomplete="off" placeholder="CSCI">
+    </div>
+    <small class="mt-[-0.5em]">Select a day from the week you wish to change</small>
+    <div class="form-group">
+        <label for="location"><i>*</i>Location:</label>
+        <input type="text" id="location" name="location" bind:value={locationMod} autocomplete="off">
+    </div>
+    <div class="form-group">
+        <label for="link">Link (if online):</label>
+        <input type="url" id="link" name="link" bind:value={linkMod} autocomplete="off">
+    </div>
+    <!-- <div> -->
+        <div class="form-group">
+            <label for="date"><i>*</i>Day:</label>
+            <select id="date" name="date" bind:value={dateMod}>
+                <option value="monday">Monday</option>
+                <option value="tuesday">Tuesday</option>
+                <option value="wednesday">Wednesday</option>
+                <option value="thursday">Thursday</option>
+                <option value="friday">Friday</option>
+                <option value="saturday">Saturday</option>
+                <option value="sunday">Sunday</option>
+            </select>
+        </div>
+    <div class="form-group">
+        <label for="start-time"><i>*</i>Start time:</label>
+        <input type="time" id="start-time" name="start-time" bind:value={startTimeMod} autocomplete="off">
+    </div>
+    <div class="form-group">
+        <label for="end-time"><i>*</i>End time:</label>
+        <input type="time" id="end-time" name="end-time" bind:value={endTimeMod} autocomplete="off">
+    </div>
+    <div class="form-group">
+        <label for="description">Description</label>
+        <input type="text" id="description" name="description" bind:value={descriptionMod} autocomplete="off" 
+        placeholder="Homework 2 discussion, etc.">
+    </div>
+    <div class="queue-group">
+        <label for="queue">Enable Queue?</label>
+        <input type="checkbox" id="queue" name="queue" bind:checked={queueEnabledMod}>
+    </div>
+    <div class="button-container">
+        <button type="submit" onclick={handleModInput}>Save</button>
+        <button>Cancel Office Hour</button>
+    </div>
+</form>
 <br><br><br>
+display previous edits to office hour here (automatically delete any after a certain time)

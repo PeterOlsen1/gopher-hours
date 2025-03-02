@@ -11,9 +11,16 @@
         link = `/office-hours/${oh.id}`;
     }
     
+    //sometimes host data is passed in as a uid reference
+    //this will allow for either
+    let hostData = $state(null);
     onMount(async () => {
-        const userData = await getUserDataCache(oh.host);
-        oh.host = userData;
+        if (typeof oh.host === "string") {
+            hostData = await getUserDataCache(oh.host);
+        }
+        else {
+            hostData = oh.host;
+        }
     });
 </script>
 
@@ -120,9 +127,11 @@
             {oh.date.slice(0, 1).toUpperCase() + oh.date.slice(1) + "s"}, 
             {to12HourTime(oh.startTime)} - {to12HourTime(oh.endTime)}
         </div>
-        <div>
-            Hosted by: {oh.host.name}, <small>{oh.host.email}</small>
-        </div>
+        {#if menu != 'user' && menu != "ta"}
+            <div>
+                Hosted by: {hostData.name}, <small>{hostData.email}</small>
+            </div>
+        {/if}
     </div>
     {#if oh.description}
         <div class="oh-description">

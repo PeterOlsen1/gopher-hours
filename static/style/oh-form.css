@@ -3,6 +3,11 @@
     margin-top: 1.5em;
 }
 
+.subtitle {
+    font-size: 1em;
+    text-align: center;
+}
+
 .soft-title {
     font-size: 2em;
     margin-top: 0.5em;
@@ -76,6 +81,10 @@ i {
         margin-top: 1em;
     }
 
+    .subtitle {
+        font-size: 0.7em;
+    }
+
     .soft-title {
         font-size: 1.5em;
         margin-top: 0.25em;
@@ -83,7 +92,7 @@ i {
 
     form {
         gap: 0.5em;
-        width: 85%;
+        width: 95%;
         font-size: 0.9em;
     }
 

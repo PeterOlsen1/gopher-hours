@@ -155,6 +155,11 @@ img {
   margin-bottom: 2em;
 }
 
+button {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 @media (height < 900px) {
   img {
     height: 40em;
@@ -237,7 +242,7 @@ img {
         </button>
       </div>
       {:else}
-      <div class="w-full text-center">
+      <div class="w-full text-center flex flex-col justify-center gap-1">
         <button class="gsi-material-button" onclick={signInWithGoogle}>
             <div class="gsi-material-button-state"></div>
             <div class="gsi-material-button-content-wrapper">
@@ -254,7 +259,7 @@ img {
               <span style="display: none;">Sign in with Google</span>
             </div>
           </button>
-          &nbsp;&nbsp;&nbsp;
+          <!-- &nbsp;&nbsp;&nbsp; -->
           <button class="gsi-material-button" onclick={() => goto("/home")}>
             Continue Anonymously
           </button>
