@@ -13,14 +13,9 @@
     
     //sometimes host data is passed in as a uid reference
     //this will allow for either
-    let hostData = $state(null);
+    let hostData = $state({});
     onMount(async () => {
-        if (typeof oh.host === "string") {
-            hostData = await getUserDataCache(oh.host);
-        }
-        else {
-            hostData = oh.host;
-        }
+        hostData = await getUserDataCache(oh.host);
     });
 </script>
 
@@ -112,10 +107,13 @@
 
 <div class="oh-container">
     {#if menu != 'user' && menu != "ta"}
-        <img src="{oh.host.photoURL}" alt="Host" class="host-photo">
+        <img src="{hostData.photoURL}" alt="Host" class="host-photo">
     {/if}
     <div class="oh-info">
         <div>
+            {#if oh.exception}
+                <b style="color: red">*</b>
+            {/if}
             <b>{oh.department} {oh.courseNumber}</b> -
             {#if oh.link}
                 <a href="{oh.link}" target="_blank" rel="noopener noreferrer">{oh.location}</a>
@@ -124,7 +122,11 @@
             {/if}
         </div>
         <div>
-            {oh.date.slice(0, 1).toUpperCase() + oh.date.slice(1) + "s"}, 
+            {#if oh.exception}
+                {oh.date.slice(0, 1).toUpperCase() + oh.date.slice(1)}
+            {:else}
+                {oh.date.slice(0, 1).toUpperCase() + oh.date.slice(1) + "s"}, 
+            {/if}
             {to12HourTime(oh.startTime)} - {to12HourTime(oh.endTime)}
         </div>
         {#if menu != 'user' && menu != "ta"}
@@ -140,6 +142,7 @@
             </div>
         </div>
     {/if}
+
     <div class="oh-arrow">
         <a href="{link}">
             <img src="/arrow.png" alt="Arrow" class="w-[3em] h-[3em]">
