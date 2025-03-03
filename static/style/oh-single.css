@@ -100,7 +100,6 @@
     padding-bottom: 3em;
     scrollbar-width: thin;
     margin-top: 1.5em;
-    height: 0; 
 
     transition: height 0.5s;
 }
@@ -223,9 +222,9 @@ input {
         width: 80%;
     }
 
-    .chatbox {
-        height: auto;
-    }
+    /* .chatbox-upper {
+        min-height: 20em;
+    } */
 }
 
 @media (width < 800px) {
@@ -289,5 +288,8 @@ input {
 @media (height > 1200px) {
     .chatbox {
         min-height: 30em;
+
+        /* set this so we can transition it */
+        height: 30em; 
     }
 }

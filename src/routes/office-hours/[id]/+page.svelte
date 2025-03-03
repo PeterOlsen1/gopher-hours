@@ -130,10 +130,15 @@
     }
 
     onMount(async () => {
-        if (window.innerWidth >= 800) {
+        if (window.innerWidth >= 800 && window.innerHeight >= 800) {
             let windowHeight = window.innerHeight;
             let chatboxTop = chatbox.getBoundingClientRect().top;
             chatbox.style.height = `calc(${windowHeight - chatboxTop}px)`;
+        }
+        else if (window.innerHeight >= 800) {
+            let windowHeight = window.innerHeight;
+            let chatboxTop = chatbox.getBoundingClientRect().top;
+            chatbox.style.minHeight = `calc(${windowHeight - chatboxTop}px)`;
         }
 
         await ensureAuth();
@@ -162,6 +167,7 @@
         endTime.setMinutes(data.endTime.split(":")[1]);
         endTime.setSeconds(0);
 
+        //some magic
         googleCalendarLink = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${page.data.department}+${page.data.courseNumber}+Office+Hours
 &dates=${startTime.toISOString().replace(/-|:|\.\d+/g, '')}%2F${endTime.toISOString().replace(/-|:|\.\d+/g, '')}
 &details=${page.data.description}&location=${page.data.location}`;

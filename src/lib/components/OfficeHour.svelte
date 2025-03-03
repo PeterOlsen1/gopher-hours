@@ -4,6 +4,7 @@
     import { onMount } from "svelte";
     let { oh, menu } = $props();
 
+    let shortMenu = $state(menu == "user" || menu == "ta");
     let link = $state("");
     if (menu === "ta") {
         link = `/office-hours/edit/${oh.id}`;
@@ -108,10 +109,12 @@
     }
 </style>
 
+<!-- style="display: {shortMenu ? 'flex' : 'grid'}" -->
 <div class="oh-container">
-    {#if menu != 'user' && menu != "ta"}
+    {#if !shortMenu}
         <img src="{hostData.photoURL}" alt="Host" class="host-photo">
     {/if}
+    <!-- style="flex: {shortMenu ? '1' : '0'}" -->
     <div class="oh-info">
         <div>
             {#if oh.exception}
@@ -132,14 +135,14 @@
             {/if}
             {to12HourTime(oh.startTime)} - {to12HourTime(oh.endTime)}
         </div>
-        {#if menu != 'user' && menu != "ta"}
+        {#if !shortMenu}
             <div>
-                Hosted by: {hostData.name}, <small>{hostData.email}</small>
+                Host: {hostData.name}, <small>{hostData.email}</small>
             </div>
         {/if}
     </div>
     {#if oh.description}
-        <div class="oh-description">
+        <div class="oh-description" style="flex: {menu != 'user' ? '1' : menu != 'ta' ? '1' : '0'}">
             <div>
                 <b>Description:</b> {oh.description}
             </div>
