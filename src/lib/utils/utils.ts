@@ -1,3 +1,5 @@
+import type { OfficeHour } from "../types/oh";
+
 /**
  * Change the time from 24 to 12 hour format
  * 
@@ -7,10 +9,10 @@
  * @param {stirng} time A string of time
  * @returns {string}
  */
-export function to12HourTime(time) {
+export function to12HourTime(time: string): string {
     let [hours, minutes] = time.split(':');
-    let period = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12 || 12;
+    let period = parseInt(hours) >= 12 ? 'PM' : 'AM';
+    hours = (parseInt(hours) % 12 || 12).toString();
     return `${hours}:${minutes} ${period}`;
 }
 
@@ -23,7 +25,7 @@ export function to12HourTime(time) {
  * @param {string} time 
  * @returns 
  */
-function timeToMinutes(time) {
+function timeToMinutes(time: string): number {
     let [hours, minutes] = time.split(':');
     return parseInt(hours) * 60 + parseInt(minutes);
 }
@@ -35,14 +37,14 @@ function timeToMinutes(time) {
  * @param {date} weekOf - the week of the office hours we are fetching for
  * @returns 
  */
-export function groupOfficeHoursByDate(oh, weekOf=null) {
+export function groupOfficeHoursByDate(oh: OfficeHour[], weekOf: Date|null=null): { [key: string]: OfficeHour[] } {
     //user passed in a custom date that wasn't today, change it
     let today = new Date();
     if (weekOf) {
         today = weekOf;
     }
 
-    let grouped = {};
+    let grouped: { [key: string]: OfficeHour[] } = {};
     oh.forEach(officeHour => {
         let exceptionFlag = false; //signifies that we already added an exception
 
@@ -53,8 +55,8 @@ export function groupOfficeHoursByDate(oh, weekOf=null) {
                     continue;
                 }
 
-                let dateChanged = exception.dateChanged.toDate();
-                let diff = (dateChanged - today) / (1000 * 60 * 60 * 24);
+                let dateChanged = exception.weekChanged.toDate();
+                let diff = (dateChanged.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
                 
                 if (diff < 7 && diff >= 0) {
                     if (exception.cancelled) {

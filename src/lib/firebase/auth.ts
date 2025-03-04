@@ -2,6 +2,7 @@ import { app } from "./firebase";
 import { GoogleAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
 import { goto } from "$app/navigation";
 import { addNewUser } from "./db";
+import type { User } from "firebase/auth";
 
 let auth = getAuth(app);
 export let user = auth.currentUser;
@@ -23,7 +24,7 @@ export async function signInWithGoogle() {
     await signInWithPopup(auth, provider);
     await ensureAuth();
     addNewUser(user);
-    console.log(user);
+
     goto("/home");
 }
 
