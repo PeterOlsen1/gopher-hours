@@ -10,6 +10,10 @@ In order to user gopher hours, you must sign in to your google account,
 time to start learning.
 
 TODOS:
+* Code organization
+  * Uniform styling
+  * Make separate db file for specific families of functions
+  * Migrate to typescript
 * Calender view
   * User customization of colors?
 * Chat feature
@@ -17,4 +21,3 @@ TODOS:
 
 * Mobile styling (and styling in general)
 * Update firestore rules
-* Migrate to typescript? (yikes)
