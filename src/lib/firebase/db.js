@@ -501,3 +501,32 @@ export async function uploadException(ohId, data) {
     const ohDocRef = doc(ohRef, ohId);
     await updateDoc(ohDocRef, ohData);
 }
+
+
+/**
+ * Remove an exception from the given office hours,
+ * uniquely identified by the date that it takes
+ * place on
+ * 
+ * @param {string} ohId 
+ * @param {Date} exceptionDate 
+ */
+export async function deleteException(ohId, exceptionDate) {
+    const ohData = await getSingleOfficeHour(ohId);
+
+    if (!ohData.exceptions) {
+        return;
+    }
+
+    //define helper function to compare dates (firestore timestamp objects)
+    let equalsDate = (e) => {
+        let eDate = e.dateChanged;
+        return eDate.nanoseconds == exceptionDate.nanoseconds
+                && eDate.seconds == exceptionDate.seconds;
+    }
+
+    //update exceptions list
+    ohData.exceptions = ohData.exceptions.filter(e => !equalsDate(e));
+    const docRef = doc(ohRef, ohId);
+    await updateDoc(docRef, ohData);
+}   

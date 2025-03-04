@@ -127,10 +127,6 @@
     }
 
     @media (width < 800px) {
-        .subtitle {
-            font-size: 0.9em;
-        }
-
         .oh-header {
             font-size: 1.2em;
             width: 95%;

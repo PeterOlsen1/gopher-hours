@@ -2,7 +2,7 @@
     import Header from "$lib/components/Header.svelte";
     import { page } from "$app/state";
     import { onMount } from "svelte";
-    import { deleteOfficeHour, getSingleOfficeHour, updateOfficeHour, uploadException } from "$lib/firebase/db";
+    import { deleteOfficeHour, getSingleOfficeHour, updateOfficeHour, uploadException, deleteException } from "$lib/firebase/db";
     import { redirectIfNotLoggedIn, user } from "$lib/firebase/auth";
     import Swal from "sweetalert2";
     import { goto } from "$app/navigation";
@@ -15,6 +15,7 @@
     const id = page.params.id;
     let ohData = $state(page.data);
 
+    //form data
     let department = $state(ohData.department);
     let courseNumber = $state(ohData.courseNumber);
     let location = $state(ohData.location);
@@ -25,7 +26,7 @@
     let description = $state(ohData.description);
     let queueEnabled = $state(ohData.queueEnabled);
 
-
+    //mofification form data
     let locationMod = $state(ohData.location);
     let linkMod = $state(ohData.link);
     let dateMod = $state(ohData.date);
@@ -35,6 +36,7 @@
     let queueEnabledMod = $state(ohData.queueEnabled);
     let originalWeek = $state('');
 
+    //handle main form input
     async function handleFormInput(e) {
         e.preventDefault();
 
@@ -108,6 +110,7 @@
         }
     }
 
+    //handle mofification form input
     async function handleModInput(e) {
         e.preventDefault();
         console.log('modifying');
@@ -147,6 +150,7 @@
         let dateDifference = date.getDay() - dates.indexOf(dateMod);
         date.setDate(date.getDate() - dateDifference);
 
+        //create data object
         const exceptionData = {
             host: user.uid,
             location: locationMod,
@@ -156,7 +160,8 @@
             endTime: endTimeMod,
             description: descriptionMod,
             queueEnabled: queueEnabledMod,
-            dateChanged: date
+            dateChanged: date,
+            cancelled: false
         }
 
         uploadException(id, exceptionData);
@@ -165,6 +170,7 @@
             text: 'Modification uploaded successfully.',
             icon: 'success'
         });
+        ohData.exceptions.push(exceptionData);
     }
 
     /**
@@ -193,7 +199,7 @@
         }
     }
 
-    async function deleteException(exception) {
+    async function handleDeleteException(exception) {
         let result = await Swal.fire({
             title: 'Warning!',
             text: 'Deleting an exception can not be undone!',
@@ -210,7 +216,66 @@
 
         if (result.isConfirmed) {
             //delete the exception
-            console.log('deleting exception');
+            deleteException(id, exception.dateChanged);
+        }
+    }
+
+    async function handleCancelOfficeHour() {
+        if (!originalWeek) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'You need to select a week to cancel.',
+                icon: 'error',
+                customClass: {
+                    confirmButton: 'swal2-error-button'
+                },
+            });
+            return;
+        }
+
+        let result = await Swal.fire({
+            title: 'Warning!',
+            text: 'Office hours for this week will be cancelled!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Confirm',
+            cancelButtonText: 'Cancel', 
+            customClass: {
+                confirmButton: 'custom-confirm-button', 
+                cancelButton: 'custom-cancel-button'
+            },
+            buttonsStyling: false
+        });
+
+        //do some math to get the week the user requested
+        const date = new Date(originalWeek);
+        date.setDate(date.getDate() + 1);
+        let dateDifference = date.getDay() - dates.indexOf(dateMod);
+        date.setDate(date.getDate() - dateDifference);
+
+        if (result.isConfirmed) {
+            //create data object
+            const exceptionData = {
+                host: user.uid,
+                location: locationMod,
+                link: linkMod,
+                date: dateMod,
+                startTime: startTimeMod,
+                endTime: endTimeMod,
+                description: descriptionMod,
+                queueEnabled: queueEnabledMod,
+                dateChanged: date,
+                cancelled: true
+            }
+
+            uploadException(id, exceptionData);
+            Swal.fire({
+                title: 'Success!',
+                text: 'Office hours cancelled successfully.',
+                icon: 'success'
+            });
+
+            ohData.exceptions.push(exceptionData);
         }
     }
 
@@ -298,7 +363,6 @@
     </div>
     <div class="button-container">
         <button type="submit" onclick={handleFormInput}>Save</button>
-        <button onclick={(e) => {e.preventDefault(); if (ref == 'oh') goto('/office-hours/' + id); else goto('/ta')}}>Cancel</button>
         <button onclick={confirmDelete}>Delete</button>
     </div>
 </form>
@@ -361,7 +425,7 @@
     </div>
     <div class="button-container">
         <button type="submit" onclick={handleModInput}>Save</button>
-        <button>Cancel Office Hour</button>
+        <button onclick={handleCancelOfficeHour}>Cancel Office Hour</button>
     </div>
 </form>
 <br><br><br>
@@ -372,10 +436,19 @@
     Click on an exception to delete it
 </div>
 <br>
-{#each page.data.exceptions as exception}
-    <div class="exception" onclick={() => deleteException(exception)}>
+{#each ohData.exceptions as exception}
+    <div class="exception" onclick={() => handleDeleteException(exception)}>
         <p><b>Week of:</b> {exception.dateChanged.toDate().toString().split(' ').splice(0, 3).join(' ')}</p>
-        <p>{exception.location} - {to12HourTime(exception.startTime)} - {to12HourTime(exception.endTime)}</p>
+        {#if exception.cancelled}
+            <p><b>Cancelled</b></p>
+        {:else}
+            <p>{exception.location} - {to12HourTime(exception.startTime)} - {to12HourTime(exception.endTime)}</p>
+        {/if}
     </div>
 {/each}
+{#if !ohData.exceptions || !ohData.exceptions.length}
+    <div class="subtitle">
+        No exceptions!
+    </div>
+{/if}
 <br><br>

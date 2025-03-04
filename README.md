@@ -10,11 +10,6 @@ In order to user gopher hours, you must sign in to your google account,
 time to start learning.
 
 TODOS:
-* OfficeHour component view on mobile is bad (with no picture)
-* Exceptions
-  * Exception system seems kinda sucky (changing description of individual office hours)
-  * Delete option
-  * Exception option to delete office hour (for the week)
 * Calender view
   * User customization of colors?
 * Chat feature

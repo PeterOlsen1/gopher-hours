@@ -199,10 +199,6 @@ button {
     font-size: 2em;
   }
 
-  .subtitle {
-    font-size: 1.2em;
-  }
-
   .main {
     flex-direction: column;
     text-align: center;

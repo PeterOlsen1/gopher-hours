@@ -57,6 +57,12 @@ export function groupOfficeHoursByDate(oh, weekOf=null) {
                 let diff = (dateChanged - today) / (1000 * 60 * 60 * 24);
                 
                 if (diff < 7 && diff >= 0) {
+                    if (exception.cancelled) {
+                        exceptionFlag = true;
+                        continue;
+                    }
+
+                    //extract the date
                     const date = exception.date.slice(0, 1).toUpperCase() + exception.date.slice(1);
                     if (!grouped[date]) {
                         grouped[date] = [];

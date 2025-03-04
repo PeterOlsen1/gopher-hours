@@ -24,7 +24,7 @@
         width: 95%;
         display: grid;
         grid-template-columns: 2fr 7fr;
-        font-size: 1.25em;
+        font-size: 1em;
         font-weight: 500;
         padding-top: 0.7em;
         padding-bottom: 0.7em;

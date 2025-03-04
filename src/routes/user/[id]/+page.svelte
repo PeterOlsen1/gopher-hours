@@ -64,13 +64,6 @@
         height: 12.5em;
         border-radius: 50%;
     }
-
-    .subtitle {
-        font-size: 1.5em;
-        font-weight: bold;
-        margin-top: 1em;
-        margin-bottom: 1em;
-    }
     
     .info {
         max-width: 20em;

@@ -223,9 +223,15 @@
     {/if}
 </div>
 {#if data.exception}
-    <div class="subtitle">
-        <b style="color: red">*</b>This week's office hour was updated from its original schedule.
-    </div>
+    {#if data.cancelled}
+        <div class="subtitle">
+            <b style="color: red">*</b>This week's office hour was cancelled.
+        </div>
+    {:else}
+        <div class="subtitle">
+            <b style="color: red">*</b>This week's office hour was updated from its original schedule.
+        </div>
+    {/if}
 {/if}
 <a href={googleCalendarLink} class="subtitle" target="_blank" style="text-decoration: underline;">
     Add to Google Calendar
@@ -239,21 +245,27 @@
             <div><b>TA:</b> {data.host.name}</div>
             <div><b>Email:</b> {data.host.email}</div>
         </div>
-        <div class="host-info info-2"> 
-            {#if data.link} 
-                <div>
-                    <a href="{data.link}" target="_blank">
-                        <b>Location:</b>
-                        <span style="text-decoration: underline">
-                            {data.location}
-                        </span>
-                    </a>
-                </div>
-            {:else}
-                <div><b>Location:</b> {data.location}</div>
-            {/if}
-            <div><b>Time:</b> {to12HourTime(data.startTime)} - {to12HourTime(data.endTime)}</div>
-        </div>
+        {#if data.cancelled}
+            <div class="host-info">
+                <div><b>Cancelled</b></div>
+            </div>
+        {:else}
+            <div class="host-info info-2"> 
+                {#if data.link} 
+                    <div>
+                        <a href="{data.link}" target="_blank">
+                            <b>Location:</b>
+                            <span style="text-decoration: underline">
+                                {data.location}
+                            </span>
+                        </a>
+                    </div>
+                {:else}
+                    <div><b>Location:</b> {data.location}</div>
+                {/if}
+                <div><b>Time:</b> {to12HourTime(data.startTime)} - {to12HourTime(data.endTime)}</div>
+            </div>
+        {/if}
     </div>
 
     {#if host}
@@ -279,7 +291,7 @@
             : "Show QR Code"}
         </button>
     {/if} -->
-    {#if page.data.queueEnabled}
+    {#if data.queueEnabled && !data.cancelled}
         <canvas id="canvas" bind:this={code} style="display: {codeShown ? 'block' : 'none'}"></canvas>
         <div class="soft-title" style="margin-bottom: 0">Queue</div>
         <div class="queue">

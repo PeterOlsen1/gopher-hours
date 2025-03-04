@@ -26,7 +26,6 @@ export async function load({ params, url }) {
             let exceptionDate = new Date(exception);
 
             for (let e of data.exceptions) {
-                console.log(e.dateChanged.toDate().getTime() == exceptionDate.getTime());
                 if (e.dateChanged.toDate().getTime() == exceptionDate.getTime()) {
                     data.date = e.date;
                     data.startTime = e.startTime;
@@ -37,6 +36,7 @@ export async function load({ params, url }) {
                     data.link = e.link;
                     data.exceptionDate = e.dateChanged.toDate();
                     data.exception = true;
+                    data.cancelled = e.cancelled;
                     break;
                 }
             }

@@ -5,6 +5,7 @@
     let { oh, menu } = $props();
 
     let shortMenu = $state(menu == "user" || menu == "ta");
+    console.log(shortMenu);
     let link = $state("");
     if (menu === "ta") {
         link = `/office-hours/edit/${oh.id}`;
@@ -66,38 +67,30 @@
     }
 
     @media (width < 800px) {
-        .oh-container {
+         .oh-container {
             width: 100%;
             border-radius: 0px;
             border-left: 0px;
             border-right: 0px;
             font-size: 0.8em;
 
-            display: grid;
-            grid-template-columns: repeat(1fr, 10);
-            grid-template-rows: auto auto;
-        }
-
-        .oh-container img {
-            grid-column: 1 / 3;
+            display: flex;
+            flex-wrap: wrap;
         }
 
         .oh-info {
-            grid-column: 3 / 10;
             text-align: left;
+            width: calc(100vw - 10em);
         }
 
         .oh-description {
-            grid-column: 1 / 6;
-            max-width: 100%;
-            margin: 0;
-            text-align: center;
-            display: grid;
-            place-items: center;
+            padding-left: 5em;
+            text-align: left;
+            display: flex;
+            align-items: center;
         }
 
         .oh-arrow {
-            grid-column: 7 / 8;
             padding: 0;
             margin-right: 1em;
         }
@@ -109,13 +102,11 @@
     }
 </style>
 
-<!-- style="display: {shortMenu ? 'flex' : 'grid'}" -->
-<div class="oh-container">
+<div class="oh-container" style="{shortMenu ? 'display: flex' : ''}">
     {#if !shortMenu}
         <img src="{hostData.photoURL}" alt="Host" class="host-photo">
     {/if}
-    <!-- style="flex: {shortMenu ? '1' : '0'}" -->
-    <div class="oh-info">
+    <div class="oh-info" style="{shortMenu ? 'width: auto' : ''}">
         <div>
             {#if oh.exception}
                 <b style="color: red">*</b>
