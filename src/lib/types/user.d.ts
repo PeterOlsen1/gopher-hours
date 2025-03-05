@@ -9,4 +9,6 @@ export interface UserEntry {
     photoURL: string;
     officeHours: string[];
     lastLogin: Timestamp;
+    queueTime: Timestamp|null;
+    favorites: string[];
 }

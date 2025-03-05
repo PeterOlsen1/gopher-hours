@@ -10,6 +10,8 @@ In order to user gopher hours, you must sign in to your google account,
 time to start learning.
 
 TODOS:
+* Typescript adaptation 
+  * Queue is now uids
 * Code organization
   * Uniform styling
   * Make separate db file for specific families of functions

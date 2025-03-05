@@ -1,4 +1,5 @@
 import type { Timestamp } from "firebase/firestore";
+import type { UserEntry } from "./user";
 
 export interface OfficeHour {
     courseNumber: string;
@@ -44,4 +45,12 @@ export interface Exception {
     exceptionDate: string;
     exception: boolean;
     cancelled: boolean;
+}
+
+export interface ChatMessage {
+    message: string;
+    timestamp: Timestamp;
+    uid: string;
+    userData: UserEntry|null;
+    id: string|null;
 }
