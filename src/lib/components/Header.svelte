@@ -1,12 +1,12 @@
-<script>
+<script lang="ts">
     import { ensureAuth, logout, signInWithGoogle, user } from "$lib/firebase/auth";
     import { onMount } from "svelte";
     
     let loggedIn = $state(true);
-    let uid = $state(null);
+    let uid: string = $state("");
     onMount(async () => {
         await ensureAuth();
-        uid = user ? user.uid : null;
+        uid = user ? user.uid : "";
         loggedIn = !!user;
     })
 </script>

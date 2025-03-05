@@ -12,6 +12,7 @@ time to start learning.
 TODOS:
 * Typescript adaptation 
   * Queue is now uids
+  * Working up in src from office-hours/\[id]
 * Code organization
   * Uniform styling
   * Make separate db file for specific families of functions

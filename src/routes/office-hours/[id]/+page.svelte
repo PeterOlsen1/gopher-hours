@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import Header from "$lib/components/Header.svelte";
     import { page } from "$app/state";
     import { onMount } from "svelte";
@@ -8,15 +8,15 @@
     import { Timestamp } from "firebase/firestore";
     import Swal from "sweetalert2";
     import { addNewChatMessage, getChatListener } from "$lib/firebase/chat";
-    import QRCode from "qrcode";
+    import type { ChatMessage, QueueEntry } from "$lib/types/oh";
+    // import QRCode from "qrcode";
 
     const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
     const id = page.params.id;
     const hostData = page.data.host;
 
-    let code;
-    let chatbox;
+    let chatbox: HTMLDivElement;
     let googleCalendarLink = $state('');
     let favorited = $state(false);
     let loading = $state(false);
@@ -25,14 +25,18 @@
     let host = $state(false);
     let currentUid = $state("");
     let descriptionText = $state("");
-    let chat = $state([]);
-    let codeShown = $state(false);
+    let chat: ChatMessage[] = $state([]);
+    // let codeShown = $state(false);
 
 
     /**
      * Function to handle a queue join
      */
     async function handleQueueJoin() {
+        if (!user) {
+            return;
+        }
+
         for (const q of data.queue) {
             if (q.uid === user.uid) {
                 Swal.fire({
@@ -80,7 +84,7 @@
      * 
      * @param removalId userId to remove from queue
      */
-    function handleQueueRemove(removalId) {
+    function handleQueueRemove(removalId: string) {
         if (host || currentUid == removalId) {
             removeFromQueue(id, removalId);
         }
@@ -101,23 +105,23 @@
      * 
      * @param messages
      */
-    function handleChatMessage(messages) {
+    function handleChatMessage(messages: ChatMessage[]) {
         console.log(messages.length);
         messages.sort((a, b) => a.timestamp.seconds - b.timestamp.seconds);
         chat = messages;
     }
 
-    function handleChatKeyPress(e) {
-        if (e.key === "Enter") {
+    function handleChatKeyPress(e: KeyboardEvent) {
+        if (e.key === "Enter" && user) {
             addNewChatMessage(id, user, chatMessage);
             chatMessage = "";
         }
     }
 
-    function toggleQR() {
-        codeShown = !codeShown;
-        QRCode.toCanvas(code, window.location.href, { errorCorrectionLevel: 'H' });
-    }
+    // function toggleQR() {
+    //     codeShown = !codeShown;
+    //     QRCode.toCanvas(code, window.location.href, { errorCorrectionLevel: 'H' });
+    // }
 
     function updateFavorite() {
         if (favorited) {
@@ -129,7 +133,7 @@
         favorited = !favorited;
     }
 
-    onMount(async () => {
+    onMount((async () => {
         if (window.innerWidth >= 800 && window.innerHeight >= 800) {
             let windowHeight = window.innerHeight;
             let chatboxTop = chatbox.getBoundingClientRect().top;
@@ -155,7 +159,6 @@
 
         //generate google calendar link
         const ohDayIdx = days.indexOf(page.data.date);
-        console.log(ohDayIdx);
         const startTime = new Date();
         startTime.setDate(startTime.getDate() + (ohDayIdx - startTime.getDay() + 7) % 7);
         startTime.setHours(data.startTime.split(":")[0]);
@@ -173,8 +176,8 @@
 &details=${page.data.description}&location=${page.data.location}`;
 
         //get subscribers so we can have live-updating data
-        const unsubscribeChat = getChatListener(id, handleChatMessage);
-        const unsunscribeQueue = getOfficeHourListener(id, (returnedData) => {
+        const unsubscribeChat = await getChatListener(id, handleChatMessage);
+        const unsunscribeQueue = await getOfficeHourListener(id, (returnedData) => {
             //dont update this if the host made an exception
             if (!page.data.exception) {
                 data = returnedData;
@@ -185,8 +188,9 @@
                 data.queue = returnedData.queue;
             }
 
-            data.queue.forEach((q, idx) => {
+            data.queue.forEach(async (q: QueueEntry, idx: number) => {
                 q.position = idx + 1;
+                q.userData = await getUserDataCache(q.uid);
             });
         });
 
@@ -195,7 +199,7 @@
             unsubscribeChat();
             unsunscribeQueue();
         };
-    });
+    }) as any);
 </script>
 
 <style>
@@ -292,16 +296,16 @@
         </button>
     {/if} -->
     {#if data.queueEnabled && !data.cancelled}
-        <canvas id="canvas" bind:this={code} style="display: {codeShown ? 'block' : 'none'}"></canvas>
+        <!-- <canvas id="canvas" bind:this={code} style="display: {codeShown ? 'block' : 'none'}"></canvas> -->
         <div class="soft-title" style="margin-bottom: 0">Queue</div>
         <div class="queue">
             {#each data.queue as q}
                 <div class="queue-item">
                     <b>{q.position}</b>
-                    <img src="{q.photoURL}" alt="{q.name}">
+                    <img src="{q.userData.photoURL}" alt="{q.userData.name}">
                     <div class="queue-item-info">
-                        <div>{q.name || q.displayName}</div>
-                        <div>{q.email}</div>
+                        <div>{q.userData.name || q.userData.displayName}</div>
+                        <div>{q.userData.email}</div>
                         <div><b>Queued at:</b> {q.queueTime.toDate().toLocaleTimeString()}</div>
                     </div>
                     {#if host || currentUid == q.uid}
@@ -324,7 +328,7 @@
     <div class="chatbox" bind:this={chatbox}>
         <div class="chatbox-upper">
             {#each chat as msg}
-                {#if msg.userData.uid == user.uid}
+                {#if msg.userData && user && msg.userData.uid == user.uid}
                     <div class="message right">
                         <div class="chat-message-text">
                             {msg.message}
@@ -335,15 +339,17 @@
                         {msg.timestamp.toDate().toLocaleTimeString()}
                     </div>
                 {:else}
-                    <div class="message left">
-                        <img src="{msg.userData.photoURL}" alt="user">
-                        <div class="chat-message-text">
-                            {msg.message}
+                    {#if msg.userData}
+                        <div class="message left">
+                            <img src="{msg.userData.photoURL}" alt="user">
+                            <div class="chat-message-text">
+                                {msg.message}
+                            </div>
                         </div>
-                    </div>
-                    <div class="timestamp-left">
-                        {msg.timestamp.toDate().toLocaleTimeString()}
-                    </div>
+                        <div class="timestamp-left">
+                            {msg.timestamp.toDate().toLocaleTimeString()}
+                        </div>
+                    {/if}
                 {/if}
             {/each}
             {#if !chat.length}
@@ -357,7 +363,7 @@
                 <input type="text" bind:value={chatMessage} onkeypress={handleChatKeyPress}
                 placeholder="Send a message to the room...">
                 <img src="/send.png" alt="send" class="send-button"
-                onclick={() => {addNewChatMessage(id, user, chatMessage); chatMessage = ""}}>
+                onclick={() => {if (user) {addNewChatMessage(id, user, chatMessage); chatMessage = ""}}}>
             </div>
         {/if}
         <small style="margin-top: -1em">

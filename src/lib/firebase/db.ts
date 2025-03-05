@@ -329,13 +329,15 @@ export async function addToQueue(ohId: string, uid: string) {
         data.queue = [];
     }
     else {
-        if (data.queue.includes(uid)) {
-            return;
-        }
+        data.queue.forEach(q => {
+            if (q.uid == uid) {
+                return;
+            }
+        })
     }
 
     userData.queueTime = Timestamp.now();
-    data.queue.push(uid);
+    data.queue.push({ uid, position: 0, userData: null, queueTime: Timestamp.now() });
     await updateDoc(docRef, data as any);
 }
 
@@ -358,7 +360,7 @@ export async function removeFromQueue(ohId: string, uid: string): Promise<void> 
         return;
     }
 
-    data.queue = data.queue.filter(q => q != uid);
+    data.queue = data.queue.filter(q => q.uid != uid);
     await updateDoc(docRef, data as any);
 
     const userRef = doc(usersRef, uid);

@@ -1,28 +1,28 @@
-<script>
+<script lang="ts">
     import Header from "$lib/components/Header.svelte";
     import { page } from "$app/state";
     import { onMount, tick } from "svelte";
-    import { getUserData, updateUserData } from "$lib/firebase/db";
+    import { updateUserData } from "$lib/firebase/db";
     import { ensureAuth, user } from "$lib/firebase/auth";
     import OfficeHour from "$lib/components/OfficeHour.svelte";
     import Swal from "sweetalert2";
+    import type { UserEntry } from "$lib/types/user";
 
     let owner = $state(false);
     const id = page.params.id;
     const data = page.data;
     let dataCopy = $state(JSON.parse(JSON.stringify(data)));
-    console.log(data);
 
     let name = $state(data.name);
     let description = $state(data.description);
     let photoURL = $state(data.photoURL);
 
-    async function handleSubmit(e) {
+    async function handleSubmit(e: Event) {
         e.preventDefault();
         
         const oh = data.officeHours;
         delete data.officeHours;
-        await updateUserData(id, data);
+        await updateUserData(id, data as UserEntry);
         data.officeHours = oh;
 
         dataCopy.name = name;
@@ -41,7 +41,12 @@
 
     onMount(async () => {
         await ensureAuth();
-        owner = id == user.uid;
+        if (user) {
+            owner = id == user.uid;
+        }
+        else {
+            owner = false;
+        }
     });
 </script>
 
@@ -120,7 +125,7 @@
             </div>
             <div class="form-group">
                 <label for="description">Description</label>
-                <input id="description" name="description" rows="4" bind:value={data.description} autocomplete="off">
+                <input id="description" name="description" bind:value={data.description} autocomplete="off">
             </div>
             <div class="form-group">
                 <label for="photoURL">Photo URL</label>

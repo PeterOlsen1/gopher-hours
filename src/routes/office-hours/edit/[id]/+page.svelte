@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import Header from "$lib/components/Header.svelte";
     import { page } from "$app/state";
     import { onMount } from "svelte";
@@ -7,6 +7,8 @@
     import Swal from "sweetalert2";
     import { goto } from "$app/navigation";
     import { data, to12HourTime } from "$lib/utils/utils";
+    import type { Exception, OfficeHour } from "$lib/types/oh";
+    import { Timestamp } from "firebase/firestore";
 
     const dates = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
@@ -37,7 +39,7 @@
     let originalWeek = $state('');
 
     //handle main form input
-    async function handleFormInput(e) {
+    async function handleFormInput(e: Event) {
         e.preventDefault();
 
         if (!department || !courseNumber || !location || !date || !startTime || !endTime) {
@@ -70,17 +72,23 @@
             return;
         }
 
-        const data = {
-            host: user.uid,
-            department,
+        const data: OfficeHour = {
+            host: user ? user.uid : "unknown",
             courseNumber,
+            department,
             location,
             link,
             date,
             startTime,
             endTime,
             description,
-            queueEnabled
+            queueEnabled: queueEnabled,
+            queue : [],
+            color: [],
+            exceptions: [],
+            id: "",
+            exceptionDate: null,
+            exception: false
         }
 
         try {
@@ -111,7 +119,7 @@
     }
 
     //handle mofification form input
-    async function handleModInput(e) {
+    async function handleModInput(e: Event) {
         e.preventDefault();
         console.log('modifying');
 
@@ -151,8 +159,8 @@
         date.setDate(date.getDate() - dateDifference);
 
         //create data object
-        const exceptionData = {
-            host: user.uid,
+        const exceptionData: Exception = {
+            host: user ? user.uid : "",
             location: locationMod,
             link: linkMod,
             date: dateMod,
@@ -160,7 +168,7 @@
             endTime: endTimeMod,
             description: descriptionMod,
             queueEnabled: queueEnabledMod,
-            dateChanged: date,
+            weekChanged: Timestamp.fromDate(date),
             cancelled: false
         }
 
@@ -176,7 +184,7 @@
     /**
      * Make sure they know what they are doing
      */
-    async function confirmDelete(e) {
+    async function confirmDelete(e: Event) {
         e.preventDefault();
 
         let result = await Swal.fire({
@@ -199,7 +207,7 @@
         }
     }
 
-    async function handleDeleteException(exception) {
+    async function handleDeleteException(exception: Exception) {
         let result = await Swal.fire({
             title: 'Warning!',
             text: 'Deleting an exception can not be undone!',
@@ -216,7 +224,7 @@
 
         if (result.isConfirmed) {
             //delete the exception
-            deleteException(id, exception.dateChanged);
+            deleteException(id, exception.weekChanged);
         }
     }
 
@@ -255,8 +263,8 @@
 
         if (result.isConfirmed) {
             //create data object
-            const exceptionData = {
-                host: user.uid,
+            const exceptionData: Exception = {
+                host: user ? user.uid : "",
                 location: locationMod,
                 link: linkMod,
                 date: dateMod,
@@ -264,7 +272,7 @@
                 endTime: endTimeMod,
                 description: descriptionMod,
                 queueEnabled: queueEnabledMod,
-                dateChanged: date,
+                weekChanged: Timestamp.fromDate(date),
                 cancelled: true
             }
 
@@ -285,7 +293,7 @@
         //make sure the user is on their own data!
         //we could show a modal here but the user could delete it and edit
         //data regardless. so just redirect instantly
-        if (user.uid != page.data.host) {
+        if (!user || (user.uid != page.data.host)) {
             goto("/ta");
         }
     });

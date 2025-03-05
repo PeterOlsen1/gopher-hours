@@ -1,5 +1,5 @@
 {
-  "extends": "@tsconfig/svelte/tsconfig.json",
+  "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig to read more about this file */
 
@@ -109,10 +109,10 @@
 
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
-    "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
+    // "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
     "moduleResolution": "node",
     "types": ["svelte", "@sveltejs/kit"]
   },
   "include": ["src/**/*.ts", "src/**/*.svelte", "src/lib/firebase/db.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
 }

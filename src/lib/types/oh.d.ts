@@ -12,7 +12,7 @@ export interface OfficeHour {
     location: string;
     queueEnabled: boolean;
     link: string;
-    queue: string[];
+    queue: QueueEntry[];
     color: number[];
     exceptions: Exception[];
     id: String|null;
@@ -27,7 +27,7 @@ export interface OfficeHour {
      * This will only be set to true if an exception has been
      * found for the requested office hour
      */
-    exception: bool|null;
+    exception: boolean|null;
 }
 
 export interface Exception {
@@ -42,9 +42,8 @@ export interface Exception {
     location: string;
     queueEnabled: boolean;
     link: string;
-    exceptionDate: string;
-    exception: boolean;
     cancelled: boolean;
+    host: string;
 }
 
 export interface ChatMessage {
@@ -53,4 +52,16 @@ export interface ChatMessage {
     uid: string;
     userData: UserEntry|null;
     id: string|null;
+}
+
+export interface QueueEntry {
+    uid: string;
+    position: number;
+    queueTime: Timestamp;
+
+    /**
+     * Keep userData as null until queue is fetched,
+     * this way we can avoid redundant data storage.    
+     */
+    userData: UserEntry|null;
 }

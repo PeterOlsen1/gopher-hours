@@ -1,11 +1,11 @@
-<script>
+<script lang="ts">
     import { getUserDataCache } from "$lib/firebase/db";
+    import type { UserEntry } from "$lib/types/user";
     import { to12HourTime } from "$lib/utils/utils";
     import { onMount } from "svelte";
     let { oh, menu } = $props();
 
     let shortMenu = $state(menu == "user" || menu == "ta");
-    console.log(shortMenu);
     let link = $state("");
     if (menu === "ta") {
         link = `/office-hours/edit/${oh.id}`;
@@ -18,7 +18,7 @@
     
     //sometimes host data is passed in as a uid reference
     //this will allow for either
-    let hostData = $state({});
+    let hostData: UserEntry|any = $state({});
     onMount(async () => {
         hostData = await getUserDataCache(oh.host);
     });

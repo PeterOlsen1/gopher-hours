@@ -1,9 +1,8 @@
 <script>
     import Header from "$lib/components/Header.svelte";
-
 </script>
-<Header></Header>
 
+<Header></Header>
 <div class="w-full grid place-items-center">
     <br><br><br>
     <div style="font-size: 3em; font-weight: 500">
