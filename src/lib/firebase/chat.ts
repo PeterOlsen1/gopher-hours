@@ -12,8 +12,9 @@ import {
     onSnapshot,
 } from 'firebase/firestore';
 import { app } from './firebase';
-import { ensureAuth, user } from './auth';
 import { getUserDataCache } from './db';
+import type { User } from 'firebase/auth';
+import type { ChatMessage } from '../types/oh';
 
 
 let db = getFirestore(app);
@@ -27,7 +28,7 @@ let ohRef = collection(db, 'officeHours');
  * @param {object} userData (firebase user object) 
  * @param {string} message chat message
  */
-export async function addNewChatMessage(ohId, user, message) {
+export async function addNewChatMessage(ohId: string, user: User, message: string): Promise<string> {
     const chatRef = collection(ohRef, ohId, 'chat');
     const data = {
         message: message,
@@ -35,6 +36,7 @@ export async function addNewChatMessage(ohId, user, message) {
         uid: user.uid,
     }
     const docRef = await addDoc(chatRef, data);
+    return docRef.id;
 }
 
 /**
@@ -43,7 +45,7 @@ export async function addNewChatMessage(ohId, user, message) {
  * @param {function(object[]): void} callback function to be called with the chat messages
  * @returns {function(): void} unsubscribe function
  */
-export async function getChatListener(ohId, callback) {
+export async function getChatListener(ohId: string, callback: (messages: ChatMessage[]) => void): Promise<() => void> {
     const chatRef = collection(ohRef, ohId, 'chat');
     const now = Timestamp.now();
     const secondsInADay = 60 * 60 * 24;
@@ -56,7 +58,7 @@ export async function getChatListener(ohId, callback) {
                 deleteDoc(doc.ref);
                 return;
             }
-            const data = doc.data();
+            const data = doc.data() as ChatMessage;
 
             //append user data to the returning data
             const uid = data.uid;

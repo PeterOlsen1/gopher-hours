@@ -13,6 +13,9 @@ import {
 } from 'firebase/firestore';
 import { app } from './firebase';
 import { ensureAuth, user } from './auth';
+import type { User } from "firebase/auth";
+import type { UserEntry } from '../types/user';
+import type { Exception, OfficeHour } from '../types/oh';
 
 
 let db = getFirestore(app);
@@ -25,7 +28,7 @@ let ohRef = collection(db, 'officeHours');
  * 
  * @param {object} userData 
  */
-export async function addNewUser(userData) {
+export async function addNewUser(userData: User): Promise<void> {
     const docRef = doc(usersRef, userData.uid);
     const docSnap = await getDoc(docRef);
     const exists = docSnap.exists();
@@ -87,7 +90,7 @@ export async function addNewUser(userData) {
  * 
  * @param {object} data 
  */
-export async function uploadNewOfficeHour(data) {
+export async function uploadNewOfficeHour(data: OfficeHour): Promise<string> {
     //add a randomly assigned color to the data 
     const color = [Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256)];
     data.color = color;
@@ -98,11 +101,14 @@ export async function uploadNewOfficeHour(data) {
     //update the user's data to include the office hour
     const userDoc = doc(usersRef, data.host);
     const userData = (await getDoc(userDoc)).data();
-    if (!userData.officeHours) {
+    if (userData && !userData.officeHours) {
         userData.officeHours = [docRef.id];
     }
-    else {
+    else if (userData) {
         userData.officeHours.push(docRef.id);
+    }
+    else {
+        return "";
     }
     await setDoc(userDoc, userData);
 
@@ -115,30 +121,15 @@ export async function uploadNewOfficeHour(data) {
  * 
  * @returns {object} a collection of all office hours
  */
-export async function getAllOfficeHours() {
+export async function getAllOfficeHours(): Promise<OfficeHour[]> {
     const querySnapshot = await getDocs(ohRef);
-    let oh = [];
+    let oh: OfficeHour[] = [];
     querySnapshot.forEach(async (doc) => {
-        const data = doc.data();
+        const data = (doc.data()) as OfficeHour;
         data.id = doc.id;
         oh.push(data);
     });
     return oh;
-}
-
-
-/**
- * Retrieve all office hours according to course query
- * 
- * Use this to find either department or course number
- * 
- * @param {number | string} course Course query
- * @returns A list of all office hours containing the course query
- */
-export async function getOfficeHoursByClassQuery(query) {
-    const allData = await getAllOfficeHours();
-    const filteredData = allData.filter(oh => oh.toLowerCase().course.includes(query.toLowerCase()));
-    return filteredData;
 }
 
 
@@ -148,10 +139,10 @@ export async function getOfficeHoursByClassQuery(query) {
  * @param {string} uid 
  * @returns 
  */
-export async function getUserData(uid) {
+export async function getUserData(uid: string): Promise<UserEntry> {
     const docRef = doc(usersRef, uid);
     const docSnap = await getDoc(docRef);
-    const data = docSnap.data();
+    const data = docSnap.data() as UserEntry;
 
     return data;
 }   
@@ -166,7 +157,7 @@ export async function getUserData(uid) {
  * @param {string} uid 
  * @returns 
  */
-export async function getUserDataCache(uid) {
+export async function getUserDataCache(uid: string): Promise<UserEntry> {
     const cache = JSON.parse(sessionStorage.getItem('userDataCache') || "{}");
 
     if (cache[uid]) {
@@ -176,7 +167,7 @@ export async function getUserDataCache(uid) {
     //cache miss, get the data
     const docRef = doc(usersRef, uid);
     const docSnap = await getDoc(docRef);
-    const data = docSnap.data();
+    const data = docSnap.data() as UserEntry;
 
     cache[uid] = data;
     sessionStorage.setItem('userDataCache', JSON.stringify(cache));
@@ -191,7 +182,7 @@ export async function getUserDataCache(uid) {
  * @param {string} uid optional user id
  * @returns all office hours for a specific user
  */
-export async function getTAOfficeHours(uid=null) {
+export async function getTAOfficeHours(uid: string|null=null): Promise<OfficeHour []> {
     if (!uid) {
         await ensureAuth();
         if (!user) {
@@ -214,12 +205,18 @@ export async function getTAOfficeHours(uid=null) {
  * 
  * @param {string} ohId 
  */
-export async function deleteOfficeHour(ohId) {
+export async function deleteOfficeHour(ohId: string): Promise<void> {
+    //ensure user is logged in
     await ensureAuth();
+    if (!user) {
+        console.log('User is not logged in');
+        return;
+    }
+
     let docRef = doc(ohRef, ohId);
     const docSnap = await getDoc(docRef);
-    const data = docSnap.data();
-    console.log(data);
+    const data = docSnap.data() as OfficeHour;
+
     if (data.host !== user.uid) {
         console.log('User does not have proper authorization to delete this office hour');
         return;
@@ -229,11 +226,11 @@ export async function deleteOfficeHour(ohId) {
 
     //remove the office hour from the user's data
     docRef = doc(usersRef, user.uid);
-    const userData = (await getDoc(docRef)).data();
+    const userData = (await getDoc(docRef)).data() as UserEntry;
     if (userData.officeHours) {
         userData.officeHours = userData.officeHours.filter(oh => oh !== ohId);
     }
-    await updateDoc(docRef, userData);
+    await updateDoc(docRef, userData as any);
 }
 
 /**
@@ -243,10 +240,10 @@ export async function deleteOfficeHour(ohId) {
  * @param {string} ohId office hour ID
  * @returns {object} office hour data
  */
-export async function getSingleOfficeHour(ohId) {
+export async function getSingleOfficeHour(ohId: string): Promise<OfficeHour> {
     const docRef = doc(ohRef, ohId);
     const docSnap = await getDoc(docRef);
-    return docSnap.data();
+    return docSnap.data() as OfficeHour;
 }
 
 /**
@@ -259,7 +256,7 @@ export async function getSingleOfficeHour(ohId) {
  * @param {object} data 
  * @returns 
  */
-export async function updateOfficeHour(ohId, data) {
+export async function updateOfficeHour(ohId: string, data: OfficeHour): Promise<void> {
     await ensureAuth();
 
     //get real data
@@ -277,18 +274,18 @@ export async function updateOfficeHour(ohId, data) {
 
     //write to the office hours reference
     const docRef = doc(ohRef, ohId);
-    await updateDoc(docRef, data);
+    await updateDoc(docRef, data as any);
 
-    //update the user's data to include the office hour
-    const userDoc = doc(usersRef, data.host);
-    const userData = (await getDoc(userDoc)).data();
-    if (!userData.officeHours) {
-        userData.officeHours = [ohId];
-    }
-    else if (!userData.officeHours.includes(ohId)) {
-        userData.officeHours.push(ohId);
-    }
-    updateDoc(userDoc, userData);
+    //update the user's data to include the office hour (we never use this. comment it out)
+    // const userDoc = doc(usersRef, data.host);
+    // const userData = (await getDoc(userDoc)).data() as UserEntry;
+    // if (!userData.officeHours) {
+    //     userData.officeHours = [ohId];
+    // }
+    // else if (!userData.officeHours.includes(ohId)) {
+    //     userData.officeHours.push(ohId);
+    // }
+    // updateDoc(userDoc, userData as any);
 }
 
 /**
@@ -299,7 +296,7 @@ export async function updateOfficeHour(ohId, data) {
  * @param {string} ohId 
  * @param {string} description 
  */
-export async function updateOfficeHourDescription(ohId, description) {
+export async function updateOfficeHourDescription(ohId: string, description: string) {
     const ohData = await getSingleOfficeHour(ohId);
     ohData.description = description;
     updateOfficeHour(ohId, ohData);
@@ -317,29 +314,31 @@ export async function updateOfficeHourDescription(ohId, description) {
  * @param {string} uid 
  * @returns 
  */
-export async function addToQueue(ohId, uid) {
+export async function addToQueue(ohId: string, uid: string) {
     const userRef = doc(usersRef, uid);
     const userDoc = await getDoc(userRef);
-    const userData = userDoc.data();
+    const userData = userDoc.data() as UserEntry;
     userData.currentlyQueued = true;
     userData.queuedFor = ohId;
-    await updateDoc(userRef, userData);
+    await updateDoc(userRef, userData as any);
 
     const docRef = doc(ohRef, ohId);
     const docSnap = await getDoc(docRef);
-    const data = docSnap.data();
+    const data = docSnap.data() as OfficeHour;
     if (!data.queue) {
         data.queue = [];
     }
     else {
-        if (data.queue.includes(uid)) {
-            return;
-        }
+        data.queue.forEach(q => {
+            if (q.uid == uid) {
+                return;
+            }
+        })
     }
 
     userData.queueTime = Timestamp.now();
-    data.queue.push(userData);
-    await updateDoc(docRef, data);
+    data.queue.push({ uid, position: 0, userData: null, queueTime: Timestamp.now() });
+    await updateDoc(docRef, data as any);
 }
 
 /**
@@ -353,23 +352,23 @@ export async function addToQueue(ohId, uid) {
  * @param {string} uid 
  * @returns 
  */
-export async function removeFromQueue(ohId, uid) {
+export async function removeFromQueue(ohId: string, uid: string): Promise<void> {
     const docRef = doc(ohRef, ohId);
     const docSnap = await getDoc(docRef);
-    const data = docSnap.data();
+    const data = docSnap.data() as OfficeHour;
     if (!data.queue) {
         return;
     }
 
     data.queue = data.queue.filter(q => q.uid != uid);
-    await updateDoc(docRef, data);
+    await updateDoc(docRef, data as any);
 
     const userRef = doc(usersRef, uid);
     const userDoc = await getDoc(userRef);
-    const userData = userDoc.data();
+    const userData = userDoc.data() as UserEntry;
     userData.currentlyQueued = false;
     userData.queuedFor = "";
-    await updateDoc(userRef, userData);
+    await updateDoc(userRef, userData as any);
 }
 
 /**
@@ -381,11 +380,11 @@ export async function removeFromQueue(ohId, uid) {
  * (including the queue)
  * @returns 
  */
-export async function getOfficeHourListener(ohId, callback) {
+export async function getOfficeHourListener(ohId: string, callback: (data: OfficeHour) => void): Promise<() => void> {
     const singleOhRef = doc(ohRef, ohId);
 
     const unsubscribe = onSnapshot(singleOhRef, (querySnapshot) => {
-        callback(querySnapshot.data());
+        callback(querySnapshot.data() as OfficeHour);
     });
 
     return unsubscribe;
@@ -402,11 +401,11 @@ export async function getOfficeHourListener(ohId, callback) {
  * @param {string} uid 
  * @param {object} data 
  */
-export async function updateUserData(uid, data) {
+export async function updateUserData(uid: string, data: UserEntry): Promise<void> {
     const docRef = doc(usersRef, uid);
     const docSnap = await getDoc(docRef);
     const userData = docSnap.data();
-    await updateDoc(docRef, data);
+    await updateDoc(docRef, data as any);
 }
 
 /**
@@ -417,18 +416,21 @@ export async function updateUserData(uid, data) {
  * 
  * @param {string} ohId 
  */
-export async function addToFavorites(ohId) {
+export async function addToFavorites(ohId: string): Promise<void> {
     await ensureAuth();
+    if (!user) {
+        return;
+    }
     const userRef = doc(usersRef, user.uid);
     const userDoc = await getDoc(userRef);
-    const userData = userDoc.data();
+    const userData = userDoc.data() as UserEntry;
     if (!userData.favorites) {
         userData.favorites = [ohId];
     }
     else {
         userData.favorites.push(ohId);
     }
-    await updateDoc(userRef, userData);
+    await updateDoc(userRef, userData as any);
 
     //update cache
     const cache = JSON.parse(sessionStorage.getItem('userDataCache') || "{}");
@@ -442,16 +444,20 @@ export async function addToFavorites(ohId) {
  * @param {string} ohId 
  * @returns 
  */
-export async function removeFromFavorites(ohId) {
+export async function removeFromFavorites(ohId: string): Promise<void> {
     await ensureAuth();
+    if (!user) {
+        return;
+    }
+
     const userRef = doc(usersRef, user.uid);
     const userDoc = await getDoc(userRef);
-    const userData = userDoc.data();
+    const userData = userDoc.data() as UserEntry;
     if (!userData.favorites) {
         return;
     }
     userData.favorites = userData.favorites.filter(f => f !== ohId);
-    await updateDoc(userRef, userData);
+    await updateDoc(userRef, userData as any);
 
     //update cache
     const cache = JSON.parse(sessionStorage.getItem('userDataCache') || "{}");
@@ -463,21 +469,26 @@ export async function removeFromFavorites(ohId) {
 * Get data for the user's favorited office hours.
 * Used in the calendar to show only favorited office hours
 */
-export async function getFavorites() {
+export async function getFavorites(): Promise<OfficeHour[]> {
     await ensureAuth();
+    if (!user) {
+        return [];
+    }
+
     const userRef = doc(usersRef, user.uid);
     const userDoc = await getDoc(userRef);
-    const userData = userDoc.data();
+    const userData = userDoc.data() as UserEntry;
     if (!userData.favorites) {
         return [];
     }
     
+    const ret = [];
     for (let i = 0; i < userData.favorites.length; i++) {
         const oh = await getSingleOfficeHour(userData.favorites[i]);
-        userData.favorites[i] = oh;
+        ret.push(oh);
     }
 
-    return userData.favorites;
+    return ret;
 }
 
 /**
@@ -488,7 +499,7 @@ export async function getFavorites() {
  * @param {string} ohId 
  * @param {object} data 
  */
-export async function uploadException(ohId, data) {
+export async function uploadException(ohId: string, data: Exception): Promise<void> {
     const ohData = await getSingleOfficeHour(ohId);
 
     if (!ohData.exceptions) {
@@ -499,7 +510,7 @@ export async function uploadException(ohId, data) {
     }
 
     const ohDocRef = doc(ohRef, ohId);
-    await updateDoc(ohDocRef, ohData);
+    await updateDoc(ohDocRef, ohData as any);
 }
 
 
@@ -511,7 +522,7 @@ export async function uploadException(ohId, data) {
  * @param {string} ohId 
  * @param {Date} exceptionDate 
  */
-export async function deleteException(ohId, exceptionDate) {
+export async function deleteException(ohId: string, exceptionDate: Timestamp): Promise<void> {
     const ohData = await getSingleOfficeHour(ohId);
 
     if (!ohData.exceptions) {
@@ -519,8 +530,8 @@ export async function deleteException(ohId, exceptionDate) {
     }
 
     //define helper function to compare dates (firestore timestamp objects)
-    let equalsDate = (e) => {
-        let eDate = e.dateChanged;
+    let equalsDate = (e: Exception) => {
+        let eDate = e.weekChanged;
         return eDate.nanoseconds == exceptionDate.nanoseconds
                 && eDate.seconds == exceptionDate.seconds;
     }
@@ -528,5 +539,5 @@ export async function deleteException(ohId, exceptionDate) {
     //update exceptions list
     ohData.exceptions = ohData.exceptions.filter(e => !equalsDate(e));
     const docRef = doc(ohRef, ohId);
-    await updateDoc(docRef, ohData);
+    await updateDoc(docRef, ohData as any);
 }   

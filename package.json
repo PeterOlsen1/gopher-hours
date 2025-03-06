@@ -12,14 +12,18 @@
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^4.0.0",
 		"@sveltejs/adapter-static": "^3.0.8",
-		"@sveltejs/kit": "^2.16.0",
+		"@sveltejs/kit": "^2.18.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
+		"@tsconfig/svelte": "^5.0.4",
+		"@types/node": "^22.13.9",
 		"autoprefixer": "^10.4.20",
 		"firebase": "^11.2.0",
 		"qrcode": "^1.5.4",
 		"svelte": "^5.0.0",
+		"svelte-check": "^4.1.4",
 		"sweetalert2": "^11.15.10",
 		"tailwindcss": "^3.4.17",
+		"typescript": "^5.8.2",
 		"vite": "^6.0.0"
 	}
 }

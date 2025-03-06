@@ -1,12 +1,12 @@
-<script>
+<script lang="ts">
     import Header from "$lib/components/Header.svelte";
     import OfficeHour from "$lib/components/OfficeHour.svelte";
     import { redirectIfNotLoggedIn } from "$lib/firebase/auth";
-    import { getAllOfficeHours, getTAOfficeHours, getUserDataCache, uploadNewOfficeHour } from "$lib/firebase/db";
+    import { getTAOfficeHours, getUserDataCache, uploadNewOfficeHour } from "$lib/firebase/db";
     import { onMount } from "svelte";
     import { user } from "$lib/firebase/auth";
-    import { to12HourTime } from "$lib/utils/utils";
     import Swal from "sweetalert2";
+    import type { OfficeHour as OfficeHourType } from "$lib/types/oh";
 
     let officeHours = $state(getTAOfficeHours());
 
@@ -20,7 +20,7 @@
     let description = $state("");
     let queue = $state(true);
 
-    async function handleFormInput(e) {
+    async function handleFormInput(e: Event) {
         e.preventDefault();
 
         //make fancy later
@@ -50,8 +50,8 @@
             return;
         }
 
-        const data = {
-            host: user.uid,
+        const data: OfficeHourType = {
+            host: user ? user.uid : "unknown",
             courseNumber,
             department,
             location,
@@ -61,7 +61,12 @@
             endTime,
             description,
             queueEnabled: queue,
-            queue : []
+            queue : [],
+            color: [],
+            exceptions: [],
+            id: "",
+            exceptionDate: null,
+            exception: false
         }
 
         try {
@@ -73,12 +78,12 @@
                 icon: 'success'
             });
             
-            const userData = await getUserDataCache(user.uid);
-            data.host = userData;
+            // const userData = await getUserDataCache(user ? user.uid : "");
+            // data.host = userData;
             let officeHoursCopy = await officeHours;
             data.id = ohId;
             officeHoursCopy.push(data);
-            officeHours = officeHoursCopy;
+            officeHours = Promise.resolve(officeHoursCopy);
 
             department = "";
             courseNumber = "";
@@ -88,7 +93,6 @@
             startTime = "";
             endTime = "";
             description = "";
-
         }
         catch (e) {
             console.log("Error uploading office hour: " + e);
