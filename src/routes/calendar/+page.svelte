@@ -5,6 +5,8 @@
     import { page } from "$app/state";
     import { ensureAuth, user } from "$lib/firebase/auth";
     import { getUserData } from "$lib/firebase/db";
+    import type { UserEntry } from "$lib/types/user";
+    import OfficeHour from "$lib/components/OfficeHour.svelte";
 
     const dates = [
         "Sunday",
@@ -17,50 +19,54 @@
     ]
 
     //declare our state variables
-    let userData = null;
+    let userData: UserEntry|null = null;
     let loggedIn = $state(false);
-    let calendar = $state(null);
+    let calendar: HTMLDivElement|null = $state(null);
     let weeks = $state([0, 1, 2, 3, 4, 5]);
     let officeHours = $state(page.data.officeHours as any);
-    let weeklyHours = $derived.by(() => {
-        return groupOfficeHoursByDate(officeHours);
-    })
+    let originalOfficeHours: OfficeHour[] = page.data.officeHours;
 
     let showFavorites = $state(false);
     let showVirtual = $state(true);
 
     let today = $state(new Date());
 
-    function handleSearch(e) {
-        const search = e.target.value.toLowerCase();
-        officeHours = page.data.officeHours.filter(oh => {
-            let condition = JSON.stringify(oh).toLowerCase().includes(search);
-            condition ||= (oh.department + ' ' + oh.courseNumber).toLowerCase().includes(search);
+    function handleSearch(e: KeyboardEvent) {
+        const target = e.target as HTMLInputElement | null;
+        if (!target) return;
+
+        const search = target.value.toLowerCase();
+        officeHours = originalOfficeHours.filter(oh => {
+            let officeHour = oh as any;
+            let condition = JSON.stringify(officeHour).toLowerCase().includes(search);
+            condition ||= (officeHour.department + ' ' + officeHour.courseNumber).toLowerCase().includes(search);
             return condition;
         });
     }
 
     function handleVirtual() {
         if (!showVirtual) {
-            officeHours = page.data.officeHours;
+            officeHours = originalOfficeHours;
         } else {
-            officeHours = page.data.officeHours.filter(oh => {
-                let condition = oh.location.toLowerCase().includes('virtual');
-                condition ||= oh.location.toLowerCase().includes('zoom');
-                condition ||= oh.location.toLowerCase().includes('online');
+            officeHours = originalOfficeHours.filter(oh => {
+                let officeHour = oh as any;
+                let condition = officeHour.location.toLowerCase().includes('virtual');
+                condition ||= officeHour.location.toLowerCase().includes('zoom');
+                condition ||= officeHour.location.toLowerCase().includes('online');
+                condition ||= officeHour.location.toLowerCase().includes('blended');
                 return !condition;
             });
         }
     }
 
     async function handleFavorites() {
-        if (!showFavorites) {
+        if (!showFavorites && userData) {
             let favorites = userData.favorites;
-            officeHours = page.data.officeHours.filter(oh => {
-                return favorites.includes(oh.id);
+            officeHours = originalOfficeHours.filter(oh => {
+                return favorites.includes((oh as any).id);
             });
         } else {
-            officeHours = page.data.officeHours;
+            officeHours = originalOfficeHours;
         }
     }
 
@@ -74,11 +80,11 @@
         createCalendar();
     }
 
-    function makeColorLight(officeHour) {
+    function makeColorLight(officeHour: any) {
         return `rgba(${officeHour.color[0]}, ${officeHour.color[1]}, ${officeHour.color[2]}, 0.2)`;
     }
 
-    function makeColor(officeHour) {
+    function makeColor(officeHour: any) {
         return `rgb(${officeHour.color[0]}, ${officeHour.color[1]}, ${officeHour.color[2]})`;
     }
 
@@ -86,6 +92,8 @@
      * Logic behind building the calendar
      */
     function createCalendar() {
+        if (!calendar) return;
+
         weeks = [0, 1, 2, 3, 4, 5];
 
         //get all of our dates we need
@@ -98,14 +106,19 @@
 
         //set starting days as invalid
         for (let i = 0; i < weekStartDay; i++) {
-            const day = calendar.querySelector(`.week-0`).children[i];
+            let day = calendar.querySelector(`.week-0`);
+            if (!day) {
+                continue;
+            }
+
+            day = day.children[i];
             day.className = 'day';
             day.classList.add('invalid-day');
         }
 
         //loop over all the weeks
         for (let i = 0; i < 6; i++) {
-            const week = calendar.querySelector(`.week-${i}`);
+            const week = calendar.querySelector<HTMLDivElement>(`.week-${i}`);
             if (!week) {
                 break;
             }
@@ -121,8 +134,11 @@
                 day.className = 'day';
 
                 //set the date string
-                day.querySelector('.day-header')
-                    .innerHTML = `${dayDate}`;
+                let dayRef = day.querySelector('.day-header');
+                if (!dayRef) {
+                    continue;
+                }
+                dayRef.innerHTML = `${dayDate}`;
 
                 if (dayDate === date 
                     && month == new Date().getMonth() 
@@ -136,13 +152,19 @@
 
                     //crazy edge case. feb is perfectly 4 weeks. happens in 2026 and not again until like 2032
                     if (month == 1 && monthOffset == 0) {
-                        calendar.querySelector('.week-4').style.display = 'none';
+                        let week4 = calendar.querySelector<HTMLDivElement>('.week-4');
+                        if (week4) {
+                            week4.style.display = 'none';
+                        }
                     }
 
                     //check if we need to remove last week
                     //either last day of month is saturday or we had an invalid day week 4
                     if (i == 4 || (i == 5 && j == 0)) {
-                        calendar.querySelector('.week-5').style.display = 'none';
+                        let week5 = calendar.querySelector<HTMLDivElement>('.week-5');
+                        if (week5) {
+                            week5.style.display = 'none';
+                        }
                     }
                 }
             }
@@ -167,7 +189,8 @@
 </svelte:head>
 
 <!-- define snippet since we don't really need a component here -->
-{#snippet calendarOfficeHour(officeHour)}
+ <!-- leave officeHour as type 'any' since the svelte/ts compiler yells at me if i leave it as OfficeHour -->
+{#snippet calendarOfficeHour(officeHour: any)}
     {@const link = officeHour.exception ? `/office-hours/${officeHour.id}?exception=${officeHour.exceptionDate}` : `/office-hours/${officeHour.id}`}
     <a href={link} class="office-hour"
     style="border-color: {makeColor(officeHour)}; background-color: {makeColorLight(officeHour)}">

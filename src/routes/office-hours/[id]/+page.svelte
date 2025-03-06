@@ -2,10 +2,9 @@
     import Header from "$lib/components/Header.svelte";
     import { page } from "$app/state";
     import { onMount } from "svelte";
-    import { addToFavorites, addToQueue, getOfficeHourListener, getSingleOfficeHour, getUserData, getUserDataCache, removeFromFavorites, removeFromQueue, updateOfficeHourDescription } from "$lib/firebase/db";
+    import { addToFavorites, addToQueue, getOfficeHourListener, getSingleOfficeHour, getUserData, getUserDataCache, removeFromFavorites, removeFromQueue } from "$lib/firebase/db";
     import { to12HourTime } from "$lib/utils/utils";
-    import { ensureAuth, redirectIfNotLoggedIn, signInWithGoogle, user } from "$lib/firebase/auth";
-    import { Timestamp } from "firebase/firestore";
+    import { ensureAuth, signInWithGoogle, user } from "$lib/firebase/auth";
     import Swal from "sweetalert2";
     import { addNewChatMessage, getChatListener } from "$lib/firebase/chat";
     import type { ChatMessage, QueueEntry } from "$lib/types/oh";
@@ -16,7 +15,9 @@
     const id = page.params.id;
     const hostData = page.data.host;
 
+    let queueRef: HTMLDivElement;
     let chatbox: HTMLDivElement;
+
     let googleCalendarLink = $state('');
     let favorited = $state(false);
     let loading = $state(false);
@@ -134,6 +135,9 @@
     }
 
     onMount((async () => {
+        loading = true;
+        queueRef.style.display = "none";
+        console.log(page.data.queue);
         if (window.innerWidth >= 800 && window.innerHeight >= 800) {
             let windowHeight = window.innerHeight;
             let chatboxTop = chatbox.getBoundingClientRect().top;
@@ -177,22 +181,23 @@
 
         //get subscribers so we can have live-updating data
         const unsubscribeChat = await getChatListener(id, handleChatMessage);
-        const unsunscribeQueue = await getOfficeHourListener(id, (returnedData) => {
+        const unsunscribeQueue = await getOfficeHourListener(id, async (returnedData) => {
             //dont update this if the host made an exception
             if (!page.data.exception) {
                 data = returnedData;
                 data.host = hostData;
                 descriptionText = data.description;
             }
-            else {
-                data.queue = returnedData.queue;
-            }
 
-            data.queue.forEach(async (q: QueueEntry, idx: number) => {
-                q.position = idx + 1;
-                q.userData = await getUserDataCache(q.uid);
-            });
+            for (let i = 0; i < returnedData.queue.length; i++) {
+                returnedData.queue[i].position = i + 1;
+                returnedData.queue[i].userData = await getUserDataCache(returnedData.queue[i].uid);
+            }
+            data.queue = returnedData.queue;
         });
+
+        loading = false;
+        queueRef.style.display = "flex";
 
         // remove subscribers on unmount
         return () => {
@@ -298,7 +303,7 @@
     {#if data.queueEnabled && !data.cancelled}
         <!-- <canvas id="canvas" bind:this={code} style="display: {codeShown ? 'block' : 'none'}"></canvas> -->
         <div class="soft-title" style="margin-bottom: 0">Queue</div>
-        <div class="queue">
+        <div class="queue" bind:this={queueRef} style="display: none">
             {#each data.queue as q}
                 <div class="queue-item">
                     <b>{q.position}</b>

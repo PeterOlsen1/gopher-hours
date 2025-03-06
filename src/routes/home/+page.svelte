@@ -1,29 +1,33 @@
-<script>
+<script lang="ts">
     import Header from "$lib/components/Header.svelte";
-    import { ensureAuth, redirectIfNotLoggedIn, user } from "$lib/firebase/auth";
+    import { ensureAuth, user } from "$lib/firebase/auth";
     import { onMount } from "svelte";
     import { getAllOfficeHours, getUserData } from "$lib/firebase/db";
-    import { data, groupOfficeHoursByDate, to12HourTime } from "$lib/utils/utils";
+    import { groupOfficeHoursByDate } from "$lib/utils/utils";
     import OfficeHour from "$lib/components/OfficeHour.svelte";
-    import { load } from "../office-hours/[id]/+page";
+    import type { UserEntry } from "$lib/types/user";
 
     let sort_order = $state([ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']);
     let showFavorites = $state(false);
     let showVirtual = $state(true);
     let loggedIn = $state(false);
-    let userData = null;
-    let officeHours = $state([]);
-    let originalOfficeHours = [];
+    let userData: UserEntry|null = null;
+    let officeHours: OfficeHour[] = $state([]);
+    let originalOfficeHours: OfficeHour[] = [];
     let loading = $state(true);
     let groupedOfficeHours = $derived.by(() => {
-        return groupOfficeHoursByDate(officeHours);
+        return groupOfficeHoursByDate(officeHours as any);
     });
 
-    function handleSearch(e) {
-        const search = e.target.value.toLowerCase();
+    function handleSearch(e: KeyboardEvent) {
+        const target = e.target as HTMLInputElement | null;
+        if (!target) return;
+
+        const search = target.value.toLowerCase();
         officeHours = originalOfficeHours.filter(oh => {
-            let condition = JSON.stringify(oh).toLowerCase().includes(search);
-            condition = condition || (oh.department + ' ' + oh.courseNumber).toLowerCase().includes(search);
+            let officeHour = oh as any;
+            let condition = JSON.stringify(officeHour).toLowerCase().includes(search);
+            condition = condition || (officeHour.department + ' ' + officeHour.courseNumber).toLowerCase().includes(search);
             return condition;
         });
     }
@@ -33,20 +37,23 @@
             officeHours = originalOfficeHours;
         } else {
             officeHours = originalOfficeHours.filter(oh => {
-                let condition = oh.location.toLowerCase().includes('virtual');
-                condition ||= oh.location.toLowerCase().includes('zoom');
-                condition ||= oh.location.toLowerCase().includes('online');
+                let officeHour = oh as any;
+                let condition = officeHour.location.toLowerCase().includes('virtual');
+                condition ||= officeHour.location.toLowerCase().includes('zoom');
+                condition ||= officeHour.location.toLowerCase().includes('online');
+                condition ||= officeHour.location.toLowerCase().includes('blended');
                 return !condition;
             });
         }
     }
 
     async function handleFavorites() {
-        if (!showFavorites) {
+        if (!showFavorites && userData) {
             let favorites = userData.favorites;
             console.log(favorites);
             officeHours = originalOfficeHours.filter(oh => {
-                return favorites.includes(oh.id);
+                let officeHour = oh as any;
+                return favorites.includes(officeHour.id);
             });
         } else {
             officeHours = originalOfficeHours;
@@ -54,7 +61,7 @@
     }
 
     onMount(async () => {
-        officeHours = await getAllOfficeHours();
+        officeHours = await getAllOfficeHours() as OfficeHour[];
 
         // do some math to make it so that today shows up first
         const today = new Date().getDay();

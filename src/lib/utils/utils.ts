@@ -54,9 +54,9 @@ export function groupOfficeHoursByDate(oh: OfficeHour[], weekOf: Date|null=null)
                 if (exceptionFlag) {
                     continue;
                 }
-
-                let dateChanged = exception.weekChanged.toDate();
-                let diff = (dateChanged.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+                
+                let weekChanged = exception.weekChanged.toDate();
+                let diff = (weekChanged.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
                 
                 if (diff < 7 && diff >= 0) {
                     if (exception.cancelled) {
@@ -79,7 +79,7 @@ export function groupOfficeHoursByDate(oh: OfficeHour[], weekOf: Date|null=null)
                         location: exception.location,
                         queueEnabled: exception.queueEnabled,
                         link: exception.link,
-                        exceptionDate: dateChanged,
+                        exceptionDate: weekChanged,
                         exception: true
                     });
 

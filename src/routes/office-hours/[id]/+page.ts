@@ -30,7 +30,7 @@ export async function load({ params, url }) {
             let exceptionDate = new Date(exception);
 
             for (let e of data.exceptions) {
-                if (e.dateChanged.toDate().getTime() == exceptionDate.getTime()) {
+                if (e.weekChanged.toDate().getTime() == exceptionDate.getTime()) {
                     data.date = e.date;
                     data.startTime = e.startTime;
                     data.endTime = e.endTime;
@@ -38,7 +38,7 @@ export async function load({ params, url }) {
                     data.location = e.location;
                     data.queueEnabled = e.queueEnabled;
                     data.link = e.link;
-                    data.exceptionDate = e.dateChanged.toDate();
+                    data.exceptionDate = e.weekChanged.toDate();
                     data.exception = true;
                     data.cancelled = e.cancelled;
                     break;
