@@ -121,7 +121,6 @@
     //handle mofification form input
     async function handleModInput(e: Event) {
         e.preventDefault();
-        console.log('modifying');
 
         if (!originalWeek || !locationMod || !dateMod || !startTimeMod || !endTimeMod) {
             Swal.fire({

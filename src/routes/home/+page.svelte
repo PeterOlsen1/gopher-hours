@@ -50,7 +50,6 @@
     async function handleFavorites() {
         if (!showFavorites && userData) {
             let favorites = userData.favorites;
-            console.log(favorites);
             officeHours = originalOfficeHours.filter(oh => {
                 let officeHour = oh as any;
                 return favorites.includes(officeHour.id);

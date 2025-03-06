@@ -15,7 +15,6 @@ export async function load({ params, url }) {
         let exception = url.searchParams.get('exception');
         const today = new Date();
         if (data.exceptions && !exception) {
-            console.log(data.exceptions);
             for (let e of data.exceptions) {
                 let dateChanged = e.weekChanged.toDate();
                 let diff = (dateChanged.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);

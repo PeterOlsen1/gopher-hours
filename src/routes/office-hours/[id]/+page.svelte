@@ -107,7 +107,6 @@
      * @param messages
      */
     function handleChatMessage(messages: ChatMessage[]) {
-        console.log(messages.length);
         messages.sort((a, b) => a.timestamp.seconds - b.timestamp.seconds);
         chat = messages;
     }
